@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
 
 import {
+  BriefcaseIcon,
   HomeIcon,
-  LayoutGridIcon,
-  PackageIcon,
+  TicketIcon,
 } from '@/components/core/icons-core';
 
 export type MenuItem = {
@@ -17,20 +17,20 @@ export const ICON_SIZE_CLASS = 'size-5';
 
 export const menuItems: MenuItem[] = [
   {
-    title: 'Dashboard',
+    title: 'Home',
     icon: <HomeIcon className="size-5" />,
     link: '/',
   },
   {
     title: 'Projects',
     description: 'Manage your projects',
-    icon: <PackageIcon className={ICON_SIZE_CLASS} />,
-    link: '/components',
+    icon: <BriefcaseIcon className={ICON_SIZE_CLASS} />,
+    link: '/projects',
   },
   {
     title: 'Tickets',
     description: 'Manage your tickets',
-    icon: <LayoutGridIcon className={ICON_SIZE_CLASS} />,
-    link: '/domains',
+    icon: <TicketIcon className={ICON_SIZE_CLASS} />,
+    link: '/tickets',
   },
 ];
