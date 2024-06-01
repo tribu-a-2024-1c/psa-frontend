@@ -1,30 +1,43 @@
-# React + TypeScript + Vite
+# PSA Project Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+PSA Project Management System is a comprehensive platform designed to enhance the efficiency and transparency of managing projects, client relations, and contractual agreements within PSA. This system is built using React, TypeScript, and Vite to offer a seamless user experience and a robust architecture for managing various project management tasks.
 
-Currently, two official plugins are available:
+## 🌟 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Project Dashboard**: Visualize project statuses and key metrics at a glance.
+- **Client Information Hub**: Central repository for client data, including products.
+- **Resource Scheduling**: Allocate resources efficiently to ensure project deadlines are met.
 
-## Expanding the ESLint configuration
+## 🛠️ Installation
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+To set up the PSA Project Management System on your local environment, follow these steps:
 
-- Configure the top-level `parserOptions` property like this:
+1. Clone the repository:
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+   ```bash
+   git clone https://github.com/tribu-a-2024-1c/psa-frontend
+   cd psa-frontend
+   ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+2. Install dependencies:
+
+   ```bash
+   pnpm install
+   ```
+
+3. Start the development local server:
+   ```bash
+   pnpm run dev
+   ```
+
+## ⚙️ Configuration
+
+Configure environment variables in `.env` file:
+
+- `VITE_API_PROJECTS_URL`: URL to the backend API for projects.
+- `VITE_API_SUPPORT_URL`: URL to the backend API for support.
+- `REACT_APP_ENVIRONMENT`: Set to `development`, `staging`, or `production` depending on the environment.
+
+## 🤝 Contributors
+
+Contributions are welcome!. Read: [CONTRIBUTORS.md](CONTRIBUTORS.md)
