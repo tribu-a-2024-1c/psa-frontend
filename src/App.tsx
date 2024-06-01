@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import Layout from './components/core/layout';
 import { ThemeProvider } from './components/theme-provider';
-import Index from './pages';
+import { ExamplePage } from './pages';
 
 function App() {
   return (
@@ -12,7 +12,7 @@ function App() {
       <BrowserRouter>
         <Layout>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<ExamplePage />} />
           </Routes>
         </Layout>
       </BrowserRouter>

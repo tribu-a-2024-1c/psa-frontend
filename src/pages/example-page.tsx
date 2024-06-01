@@ -3,7 +3,7 @@ import { useState } from 'react';
 import viteLogo from '/vite.svg';
 import reactLogo from '@/assets/react.svg';
 
-function Index() {
+export function ExamplePage() {
   const [count, setCount] = useState(0);
 
   return (
@@ -38,5 +38,3 @@ function Index() {
     </>
   );
 }
-
-export default Index;
