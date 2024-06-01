@@ -11,8 +11,12 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="flex min-h-screen w-full bg-muted/40">
       <Sidebar />
-      <Header />
-      <main className="flex-1 p-4 sm:px-6">{children}</main>;
+      <div className="flex flex-1 flex-col">
+        <Header />
+        <main className="flex-1 p-4 sm:px-6">{children}</main>
+      </div>
     </div>
   );
 };
+
+export default Layout;

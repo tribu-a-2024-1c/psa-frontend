@@ -31,7 +31,7 @@ export const Header = () => {
           <DropdownMenuTrigger asChild>
             <Button className="relative size-8 rounded-full" variant="outline">
               <Avatar>
-                <AvatarImage alt="@shadcn" src="/placeholder-avatar.jpg" />
+                <AvatarImage alt="@shadcn" src="/placeholder.svg" />
                 <AvatarFallback>S</AvatarFallback>
               </Avatar>
             </Button>
@@ -40,13 +40,13 @@ export const Header = () => {
             <DropdownMenuLabel>
               <div className="flex items-center space-x-2">
                 <Avatar>
-                  <AvatarImage alt="@shadcn" src="/placeholder-avatar.jpg" />
+                  <AvatarImage alt="@shadcn" src="/placeholder.svg" />
                   <AvatarFallback>S</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium leading-none">Soport Engineer</p>
+                  <p className="font-medium leading-none">Support Engineer</p>
                   <p className="text-xs leading-none text-muted-foreground">
-                    soport@psa.com
+                    support@psa.com
                   </p>
                 </div>
               </div>
