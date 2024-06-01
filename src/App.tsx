@@ -1,11 +1,14 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import './globals.css'
+import './App.css';
+import './globals.css';
+
+import { useState } from 'react';
+
+import viteLogo from '/vite.svg';
+
+import reactLogo from './assets/react.svg';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
 
   return (
     <>
@@ -17,10 +20,10 @@ function App() {
           <img src={reactLogo} className="w-20" alt="React logo" />
         </a>
       </div>
-      <h1 className="text-3xl font-bold text-center mt-4">Vite + React</h1>
-      <div className="card p-4 bg-white shadow-md rounded-lg text-center mt-4">
+      <h1 className="mt-4 text-center text-3xl font-bold">Vite + React</h1>
+      <div className="card mt-4 rounded-lg bg-white p-4 text-center shadow-md">
         <button
-          className="font-bold py-2 px-4 rounded-xl border-2 border-blue-300 hover:border-blue-700 transition-colors"
+          className="rounded-xl border-2 border-blue-300 px-4 py-2 font-bold transition-colors hover:border-blue-700"
           onClick={() => setCount((count) => count + 1)}
         >
           count is {count}
@@ -29,11 +32,11 @@ function App() {
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
       </div>
-      <p className="read-the-docs text-center mt-4">
+      <p className="read-the-docs mt-4 text-center">
         Click on the Vite and React logos to learn more
       </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
