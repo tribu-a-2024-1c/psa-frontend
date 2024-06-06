@@ -13,7 +13,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <Sidebar />
       <div className="flex flex-1 flex-col">
         <Header />
-        <main className="flex-1 p-4 sm:px-6">{children}</main>
+        <main className="flex-1 pl-20 pt-4">{children}</main>
       </div>
     </div>
   );
