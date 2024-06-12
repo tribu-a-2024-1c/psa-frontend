@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import Layout from './components/core/layout';
 import { ThemeProvider } from './components/theme-provider';
-import { ExamplePage } from './pages';
+import { ExamplePage, ProjectPage } from './pages';
 
 function App() {
   return (
@@ -13,6 +13,7 @@ function App() {
         <Layout>
           <Routes>
             <Route path="/" element={<ExamplePage />} />
+            <Route path="/projects" element={<ProjectPage />} />
           </Routes>
         </Layout>
       </BrowserRouter>
