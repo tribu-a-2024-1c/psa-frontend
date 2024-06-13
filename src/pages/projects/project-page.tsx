@@ -39,7 +39,7 @@ export function ProjectPage() {
   useEffect(() => {
     const fetchProjects = async () => {
       const projects = await client.projects.get('/projects');
-      console.log({ projects });
+      console.log(projects );
     };
 
     fetchProjects();
