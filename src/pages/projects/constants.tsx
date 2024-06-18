@@ -65,14 +65,18 @@ export const PROJECTS_MOCK = [
 
 export const TABLE_COLUMNS = [
   'ID',
-  'Title',
-  'Description',
-  'Start Date',
-  'End Date',
-  'State',
-  'Client',
-  'Actions',
+  'Nombre',
+  'Descripción',
+  'Fecha de Inicio',
+  'Fecha de Finalización',
+  'Estado',
+  'Cliente',
+  'Acciones',
 ];
+
+export const PROJECT_STATES = ['No comenzado', 'En Progreso', 'Finalizado'];
+export const PROJECT_CLIENTS = ['Don Carlos', 'Doña Marta', 'El Cholo'];
+export const PROJECT_PRODUCTS = ['Product A', 'Product B', 'Product C'];
 
 export const ACTION_BUTTONS = [
   { label: 'View', icon: <EyeIcon className="size-4" /> },

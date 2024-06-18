@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import Layout from './components/core/layout';
 import { ThemeProvider } from './components/theme-provider';
-import { ExamplePage, ProjectPage } from './pages';
+import { AddProjectPage, ExamplePage, ProjectPage } from './pages';
 
 function App() {
   return (
@@ -14,6 +14,7 @@ function App() {
           <Routes>
             <Route path="/" element={<ExamplePage />} />
             <Route path="/projects" element={<ProjectPage />} />
+            <Route path="/projects/new" element={<AddProjectPage />} />
           </Routes>
         </Layout>
       </BrowserRouter>
