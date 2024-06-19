@@ -1,3 +1,5 @@
+import type { Control, FieldValues } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
@@ -16,125 +18,172 @@ import { Textarea } from '@/components/ui/textarea';
 
 import { PROJECT_CLIENTS, PROJECT_PRODUCTS, PROJECT_STATES } from './constants';
 
-function FormTextarea({
-  id,
-  label,
-  placeholder,
-}: {
+interface FormTextareaProps {
   id: string;
   label: string;
   placeholder: string;
-}) {
+  control: Control<FieldValues>;
+}
+
+function FormTextarea({ id, label, placeholder, control }: FormTextareaProps) {
   return (
     <div className="grid gap-2">
       <Label htmlFor={id}>{label}</Label>
-      <Textarea id={id} placeholder={placeholder} className="min-h-[100px]" />
+      <Controller
+        name={id}
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <Textarea
+            {...field}
+            id={id}
+            placeholder={placeholder}
+            className="min-h-[100px]"
+          />
+        )}
+      />
     </div>
   );
 }
 
-function FormSelect({
-  id,
-  label,
-  options,
-}: {
+interface FormSelectProps {
   id: string;
   label: string;
   options: string[];
-}) {
+  control: Control<FieldValues>;
+}
+
+function FormSelect({ id, label, options, control }: FormSelectProps) {
   return (
     <div className="grid gap-2">
       <Label htmlFor={id}>{label}</Label>
-      <Select>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder={`Seleccionar ${label.toLowerCase()}`} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectLabel>{label}</SelectLabel>
-            {options.map((option) => (
-              <SelectItem key={option} value={option}>
-                {option}
-              </SelectItem>
-            ))}
-          </SelectGroup>
-        </SelectContent>
-      </Select>
+      <Controller
+        name={id}
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <Select {...field} onValueChange={field.onChange}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder={`Seleccionar ${label.toLowerCase()}`} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>{label}</SelectLabel>
+                {options.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        )}
+      />
     </div>
   );
+}
+
+interface FormItemProps {
+  id: string;
+  label: string;
+  placeholder: string;
+  type?: string;
+  control: Control<FieldValues>;
 }
 
 function FormItem({
   id,
   label,
-  placeholder = '',
+  placeholder,
   type = 'text',
-}: {
-  id: string;
-  label: string;
-  placeholder: string;
-  type?: string;
-}) {
+  control,
+}: FormItemProps) {
   return (
     <div className="grid gap-2">
       <Label htmlFor={id}>{label}</Label>
-      <Input id={id} type={type} placeholder={placeholder} />
+      <Controller
+        name={id}
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <Input {...field} id={id} type={type} placeholder={placeholder} />
+        )}
+      />
     </div>
   );
 }
 
 export function AddProjectPage() {
   const navigate = useNavigate();
+  const {
+    control,
+    handleSubmit,
+    formState: { isValid },
+  } = useForm({ mode: 'onChange' });
+
+  const onSubmit = (data: FieldValues) => {
+    console.log({ data });
+    navigate('/projects');
+  };
 
   return (
     <div className="flex flex-1">
       <div className="flex-1 bg-gray-100 p-4 dark:bg-gray-950 md:p-6">
         <h1 className="mb-4 text-2xl font-bold">Crear Proyecto Nuevo</h1>
-        <div className="grid gap-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
           <FormItem
             id="project-title"
             label="Título"
             placeholder="Ingrese título del proyecto"
+            control={control}
           />
           <FormTextarea
             id="project-description"
             label="Descripción"
             placeholder="Ingrese descripción del proyecto"
+            control={control}
           />
           <FormItem
             id="project-start-date"
             label="Fecha de Inicio"
             type="date"
             placeholder="Ingrese fecha de inicio"
+            control={control}
           />
           <FormItem
             id="project-end-date"
             label="Fecha de Finalización"
             type="date"
             placeholder="Ingrese fecha de finalización"
+            control={control}
           />
           <FormSelect
             id="project-state"
             label="Estado"
             options={PROJECT_STATES}
+            control={control}
           />
           <FormSelect
             id="project-client"
             label="Cliente"
             options={PROJECT_CLIENTS}
+            control={control}
           />
           <FormSelect
             id="project-product"
             label="Producto"
             options={PROJECT_PRODUCTS}
+            control={control}
           />
-        </div>
-        <div className="mt-4 flex justify-end gap-2">
-          <Button variant="secondary" onClick={() => navigate('/projects')}>
-            Cancelar
-          </Button>
-          <Button onClick={() => navigate('/projects')}>Agregar</Button>
-        </div>
+          <div className="mt-4 flex justify-end gap-2">
+            <Button variant="secondary" onClick={() => navigate('/projects')}>
+              Cancelar
+            </Button>
+            <Button type="submit" disabled={!isValid}>
+              Agregar
+            </Button>
+          </div>
+        </form>
       </div>
     </div>
   );
