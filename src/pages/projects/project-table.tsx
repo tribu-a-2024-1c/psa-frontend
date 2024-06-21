@@ -1,6 +1,16 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 
 import type { Project } from '@/api/types';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -12,6 +22,8 @@ import {
 } from '@/components/ui/table';
 
 import { ACTION_BUTTONS, TABLE_COLUMNS } from './constants';
+import { DeleteProjectDialog } from './delete-project-dialog';
+import { ViewProjectDialog } from './view-project-dialog';
 
 function ActionButton({
   icon,
@@ -31,21 +43,36 @@ function ActionButton({
 }
 
 export function ProjectTable({ projects }: { projects: Project[] }) {
+  const [deleteProject, setDeleteProject] = useState<Project | null>(null);
+  const [viewProject, setViewProject] = useState<Project | null>(null);
+  const [editProject, setEditProject] = useState<Project | null>(null);
+
   const handleActionClick = (action: string, project: Project) => {
     switch (action) {
       case 'View':
-        console.log({ action, project });
-        // onView(project);
+        setViewProject(project);
         break;
       case 'Edit':
-        console.log({ action, project });
+        setEditProject(project);
         break;
       case 'Delete':
-        console.log({ action, project });
+        setDeleteProject(project);
         break;
       default:
         break;
     }
+  };
+
+  const handleDelete = (project: Project) => {
+    console.log('Deleting project:', project);
+    // Implement delete functionality (e.g., API call)
+    setDeleteProject(null);
+  };
+
+  const handleEditSave = (project: Project) => {
+    console.log('Saving edited project:', project);
+    // Implement save functionality (e.g., API call)
+    setEditProject(null);
   };
 
   return (
@@ -67,7 +94,6 @@ export function ProjectTable({ projects }: { projects: Project[] }) {
               <TableCell>{project.startDate}</TableCell>
               <TableCell>{project.endDate}</TableCell>
               <TableCell>{project.status}</TableCell>
-              <TableCell>{project.client.name}</TableCell>
               <TableCell>
                 <div className="flex gap-2">
                   {ACTION_BUTTONS.map(({ label, icon }) => (
@@ -84,6 +110,107 @@ export function ProjectTable({ projects }: { projects: Project[] }) {
           ))}
         </TableBody>
       </Table>
+      {editProject && (
+        <AlertDialog open={true} onOpenChange={() => setEditProject(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Edit Project</AlertDialogTitle>
+              <AlertDialogDescription>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleEditSave(editProject);
+                  }}
+                >
+                  <label>
+                    Title:
+                    <input
+                      type="text"
+                      value={editProject.title}
+                      onChange={(e) =>
+                        setEditProject({
+                          ...editProject,
+                          title: e.target.value,
+                        })
+                      }
+                    />
+                  </label>
+                  <label>
+                    Description:
+                    <textarea
+                      value={editProject.description}
+                      onChange={(e) =>
+                        setEditProject({
+                          ...editProject,
+                          description: e.target.value,
+                        })
+                      }
+                    />
+                  </label>
+                  <label>
+                    Start Date:
+                    <input
+                      type="date"
+                      value={editProject.startDate}
+                      onChange={(e) =>
+                        setEditProject({
+                          ...editProject,
+                          startDate: e.target.value,
+                        })
+                      }
+                    />
+                  </label>
+                  <label>
+                    End Date:
+                    <input
+                      type="date"
+                      value={editProject.endDate}
+                      onChange={(e) =>
+                        setEditProject({
+                          ...editProject,
+                          endDate: e.target.value,
+                        })
+                      }
+                    />
+                  </label>
+                  <label>
+                    Status:
+                    <select
+                      value={editProject.status}
+                      onChange={(e) =>
+                        setEditProject({
+                          ...editProject,
+                          status: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                  </label>
+                  <AlertDialogFooter>
+                    <AlertDialogAction type="submit">Save</AlertDialogAction>
+                    <AlertDialogCancel onClick={() => setEditProject(null)}>
+                      Cancel
+                    </AlertDialogCancel>
+                  </AlertDialogFooter>
+                </form>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+
+      <ViewProjectDialog
+        project={viewProject}
+        onClose={() => setViewProject(null)}
+      />
+      <DeleteProjectDialog
+        project={deleteProject}
+        onDelete={handleDelete}
+        onClose={() => setDeleteProject(null)}
+      />
     </div>
   );
 }

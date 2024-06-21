@@ -5,11 +5,10 @@ import { client } from '@/api/common/client';
 import type { Project } from '@/api/types';
 import { Button } from '@/components/ui/button';
 
-import { PROJECTS_MOCK } from './constants';
 import { ProjectTable } from './project-table';
 
 export function ProjectPage() {
-  const [projects, setProjects] = useState<Project[] | null>(PROJECTS_MOCK);
+  const [projects, setProjects] = useState<Project[] | null>();
   const navigate = useNavigate();
 
   useEffect(() => {

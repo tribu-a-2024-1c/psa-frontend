@@ -2,6 +2,8 @@ import type { Control, FieldValues } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
+import { client } from '@/api/common/client';
+import type { Project } from '@/api/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,7 +18,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
-import { PROJECT_CLIENTS, PROJECT_PRODUCTS, PROJECT_STATES } from './constants';
+import { PROJECT_STATES } from './constants';
 
 interface FormTextareaProps {
   id: string;
@@ -121,9 +123,19 @@ export function AddProjectPage() {
     formState: { isValid },
   } = useForm({ mode: 'onChange' });
 
+  const createProject = (payload: Project) => {
+    client.projects
+      .post('/projects', { ...payload })
+      .then(() => {
+        navigate('/projects');
+      })
+      .catch((error) => {
+        console.error('Error fetching projects:', error);
+      });
+  };
+
   const onSubmit = (data: FieldValues) => {
-    console.log({ data });
-    navigate('/projects');
+    createProject(data as Project);
   };
 
   return (
@@ -132,47 +144,35 @@ export function AddProjectPage() {
         <h1 className="mb-4 text-2xl font-bold">Crear Proyecto Nuevo</h1>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
           <FormItem
-            id="project-title"
+            id="title"
             label="Título"
             placeholder="Ingrese título del proyecto"
             control={control}
           />
           <FormTextarea
-            id="project-description"
+            id="description"
             label="Descripción"
             placeholder="Ingrese descripción del proyecto"
             control={control}
           />
           <FormItem
-            id="project-start-date"
+            id="startDate"
             label="Fecha de Inicio"
             type="date"
             placeholder="Ingrese fecha de inicio"
             control={control}
           />
           <FormItem
-            id="project-end-date"
+            id="endDate"
             label="Fecha de Finalización"
             type="date"
             placeholder="Ingrese fecha de finalización"
             control={control}
           />
           <FormSelect
-            id="project-state"
+            id="status"
             label="Estado"
             options={PROJECT_STATES}
-            control={control}
-          />
-          <FormSelect
-            id="project-client"
-            label="Cliente"
-            options={PROJECT_CLIENTS}
-            control={control}
-          />
-          <FormSelect
-            id="project-product"
-            label="Producto"
-            options={PROJECT_PRODUCTS}
             control={control}
           />
           <div className="mt-4 flex justify-end gap-2">

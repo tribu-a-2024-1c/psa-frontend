@@ -1,12 +1,32 @@
 import { EyeIcon, FilePenIcon, TrashIcon } from 'lucide-react';
 
+export const TABLE_COLUMNS = [
+  'ID',
+  'Nombre',
+  'Descripción',
+  'Fecha de Inicio',
+  'Fecha de Finalización',
+  'Estado',
+  'Acciones',
+];
+
+export const PROJECT_STATES = ['No Comenzado', 'En Progreso', 'Finalizado'];
+export const PROJECT_CLIENTS = ['Don Carlos', 'Doña Marta', 'El Cholo'];
+export const PROJECT_PRODUCTS = ['Product A', 'Product B', 'Product C'];
+
+export const ACTION_BUTTONS = [
+  { label: 'View', icon: <EyeIcon className="size-4" /> },
+  { label: 'Edit', icon: <FilePenIcon className="size-4" /> },
+  { label: 'Delete', icon: <TrashIcon className="size-4" /> },
+];
+
 export const PROJECTS_MOCK = [
   {
     id: 'PRJ001',
     title: 'Empanada Revolution',
     startDate: '2023-04-01',
     endDate: '2023-06-30',
-    status: 'In Progress',
+    status: 'En Progreso',
     description: 'Redesign the empanada business website',
     client: {
       id: 0,
@@ -26,7 +46,7 @@ export const PROJECTS_MOCK = [
     title: 'Dulce de Leche App',
     startDate: '2023-03-15',
     endDate: '2023-07-31',
-    status: 'In Progress',
+    status: 'En Progreso',
     description: 'Develop a mobile app for the dulce de leche shop',
     client: {
       id: 0,
@@ -46,7 +66,7 @@ export const PROJECTS_MOCK = [
     title: 'Mate Master',
     startDate: '2023-01-01',
     endDate: '2023-12-31',
-    status: 'Completed',
+    status: 'No Comenzado',
     description: 'Implement a new mate brewing system',
     client: {
       id: 0,
@@ -61,25 +81,224 @@ export const PROJECTS_MOCK = [
       name: 'string',
     },
   },
-];
-
-export const TABLE_COLUMNS = [
-  'ID',
-  'Nombre',
-  'Descripción',
-  'Fecha de Inicio',
-  'Fecha de Finalización',
-  'Estado',
-  'Cliente',
-  'Acciones',
-];
-
-export const PROJECT_STATES = ['No comenzado', 'En Progreso', 'Finalizado'];
-export const PROJECT_CLIENTS = ['Don Carlos', 'Doña Marta', 'El Cholo'];
-export const PROJECT_PRODUCTS = ['Product A', 'Product B', 'Product C'];
-
-export const ACTION_BUTTONS = [
-  { label: 'View', icon: <EyeIcon className="size-4" /> },
-  { label: 'Edit', icon: <FilePenIcon className="size-4" /> },
-  { label: 'Delete', icon: <TrashIcon className="size-4" /> },
+  {
+    id: 'PRJ004',
+    title: 'Alfajor Universe',
+    startDate: '2023-05-01',
+    endDate: '2023-08-30',
+    status: 'En Progreso',
+    description: 'Create a new e-commerce platform for alfajores',
+    client: {
+      id: 0,
+      name: 'Don Pepito',
+      contract: 'string',
+      address: 'string',
+      phone: 'string',
+      projects: ['string'],
+    },
+    product: {
+      id: 0,
+      name: 'string',
+    },
+  },
+  {
+    id: 'PRJ005',
+    title: 'Tango Nights',
+    startDate: '2023-02-01',
+    endDate: '2023-09-30',
+    status: 'En Progreso',
+    description: 'Develop a promotional website for tango events',
+    client: {
+      id: 0,
+      name: 'Doña Maria',
+      contract: 'string',
+      address: 'string',
+      phone: 'string',
+      projects: ['string'],
+    },
+    product: {
+      id: 0,
+      name: 'string',
+    },
+  },
+  {
+    id: 'PRJ006',
+    title: 'Gaucho Adventure',
+    startDate: '2023-06-01',
+    endDate: '2023-11-30',
+    status: 'Finalizado',
+    description: 'Design a travel itinerary app for gaucho tours',
+    client: {
+      id: 0,
+      name: 'El Patrón',
+      contract: 'string',
+      address: 'string',
+      phone: 'string',
+      projects: ['string'],
+    },
+    product: {
+      id: 0,
+      name: 'string',
+    },
+  },
+  {
+    id: 'PRJ007',
+    title: 'Vino Virtuoso',
+    startDate: '2023-03-01',
+    endDate: '2023-10-31',
+    status: 'En Progreso',
+    description: 'Create a wine tasting event management system',
+    client: {
+      id: 0,
+      name: 'Señor Mendoza',
+      contract: 'string',
+      address: 'string',
+      phone: 'string',
+      projects: ['string'],
+    },
+    product: {
+      id: 0,
+      name: 'string',
+    },
+  },
+  {
+    id: 'PRJ008',
+    title: 'Chimichurri Conquest',
+    startDate: '2023-04-15',
+    endDate: '2023-12-15',
+    status: 'En Progreso',
+    description: 'Launch a global campaign for chimichurri sauce',
+    client: {
+      id: 0,
+      name: 'El Chef',
+      contract: 'string',
+      address: 'string',
+      phone: 'string',
+      projects: ['string'],
+    },
+    product: {
+      id: 0,
+      name: 'string',
+    },
+  },
+  {
+    id: 'PRJ009',
+    title: 'Patagonia Adventures',
+    startDate: '2023-05-20',
+    endDate: '2023-12-31',
+    status: 'Finalizado',
+    description: 'Develop a travel guide app for Patagonia',
+    client: {
+      id: 0,
+      name: 'Señora Flores',
+      contract: 'string',
+      address: 'string',
+      phone: 'string',
+      projects: ['string'],
+    },
+    product: {
+      id: 0,
+      name: 'string',
+    },
+  },
+  {
+    id: 'PRJ010',
+    title: 'Carnival Extravaganza',
+    startDate: '2023-03-10',
+    endDate: '2023-11-30',
+    status: 'En Progreso',
+    description: 'Create an event management system for the carnival',
+    client: {
+      id: 0,
+      name: 'Señor Gomez',
+      contract: 'string',
+      address: 'string',
+      phone: 'string',
+      projects: ['string'],
+    },
+    product: {
+      id: 0,
+      name: 'string',
+    },
+  },
+  {
+    id: 'PRJ011',
+    title: 'Coffee Culture',
+    startDate: '2023-04-01',
+    endDate: '2023-12-01',
+    status: 'En Progreso',
+    description: 'Develop a promotional app for coffee shops',
+    client: {
+      id: 0,
+      name: 'Señorita Rodriguez',
+      contract: 'string',
+      address: 'string',
+      phone: 'string',
+      projects: ['string'],
+    },
+    product: {
+      id: 0,
+      name: 'string',
+    },
+  },
+  {
+    id: 'PRJ012',
+    title: 'Pampa Picnic',
+    startDate: '2023-06-01',
+    endDate: '2023-09-30',
+    status: 'Finalizado',
+    description: 'Design a picnic event management system for the Pampa region',
+    client: {
+      id: 0,
+      name: 'Don Juan',
+      contract: 'string',
+      address: 'string',
+      phone: 'string',
+      projects: ['string'],
+    },
+    product: {
+      id: 0,
+      name: 'string',
+    },
+  },
+  {
+    id: 'PRJ013',
+    title: 'Tango Festival',
+    startDate: '2023-02-15',
+    endDate: '2023-11-15',
+    status: 'En Progreso',
+    description: 'Create a website for the annual tango festival',
+    client: {
+      id: 0,
+      name: 'Señora Garcia',
+      contract: 'string',
+      address: 'string',
+      phone: 'string',
+      projects: ['string'],
+    },
+    product: {
+      id: 0,
+      name: 'string',
+    },
+  },
+  {
+    id: 'PRJ014',
+    title: 'Asado Arena',
+    startDate: '2023-03-01',
+    endDate: '2023-12-31',
+    status: 'En Progreso',
+    description: 'Develop an online platform for asado enthusiasts',
+    client: {
+      id: 0,
+      name: 'El Asador',
+      contract: 'string',
+      address: 'string',
+      phone: 'string',
+      projects: ['string'],
+    },
+    product: {
+      id: 0,
+      name: 'string',
+    },
+  },
 ];
