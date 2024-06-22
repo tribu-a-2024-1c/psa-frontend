@@ -2,52 +2,50 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { client } from '@/api/common/client';
-import type { Project } from '@/api/types';
+import type { Task } from '@/api/types';
 import { Button } from '@/components/ui/button';
 
-import { ProjectTable } from './project-table';
+import { TaskTable } from './task-table';
 
-export function ProjectPage() {
-  const [projects, setProjects] = useState<Project[] | null>();
+export function TaskPage() {
+  const [tasks, setTasks] = useState<Task[] | null>();
   const [isLoading, setIsLoading] = useState(false);
-
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchProjects = () => {
+    const fetchTask = () => {
       setIsLoading(true);
       client.projects
-        .get('/projects')
+        .get('/projects/tasks')
         .then((response) => {
-          setProjects(response.data);
+          setTasks(response.data);
         })
         .catch((error) => {
-          setProjects([]);
-          console.error('Error fetching projects:', error);
+          console.error('Error fetching tasks:', error);
         })
         .finally(() => setIsLoading(false));
     };
 
-    fetchProjects();
+    fetchTask();
   }, []);
 
   return (
     <div className="flex flex-1">
       <div className="flex-1 px-4 py-2">
         <div className="mb-4 flex items-center">
-          <h1 className="text-2xl font-bold">Proyectos</h1>
+          <h1 className="text-2xl font-bold">Tareas</h1>
           <Button
             className="ml-auto"
             size="sm"
-            onClick={() => navigate('/projects/new')}
+            onClick={() => navigate('/tasks/new')}
           >
-            Crear Proyecto
+            Crear Tarea
           </Button>
         </div>
-        {isLoading && 'Cargando proyectos...'}
-        {!isLoading && !projects?.length && 'No hay proyectos disponibles'}
-        {!isLoading && projects && projects?.length > 0 && (
-          <ProjectTable projects={projects} />
+        {isLoading && 'Cargando tareas...'}
+        {!isLoading && !tasks?.length && 'No hay tareas disponibles'}
+        {!isLoading && tasks && tasks?.length > 0 && (
+          <TaskTable tasks={tasks} />
         )}
       </div>
     </div>

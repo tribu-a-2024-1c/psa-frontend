@@ -5,7 +5,8 @@ export const TABLE_COLUMNS = [
   'Fecha de Inicio',
   'Fecha de Finalización',
   'Estado',
-  'Acciones',
+  'Estimación',
+  'Proyecto',
 ];
 
-export const PROJECT_STATES = ['No Comenzado', 'En Progreso', 'Finalizado'];
+export const TASK_STATES = ['No Comenzado', 'En Progreso', 'Finalizado'];
