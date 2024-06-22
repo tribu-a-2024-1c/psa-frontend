@@ -9,13 +9,12 @@ import { ProjectTable } from './project-table';
 
 export function ProjectPage() {
   const [projects, setProjects] = useState<Project[] | null>();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProjects = () => {
-      setIsLoading(true);
       client.projects
         .get('/projects')
         .then((response) => {
@@ -44,10 +43,9 @@ export function ProjectPage() {
             Crear Proyecto
           </Button>
         </div>
-        {isLoading && 'Cargando proyectos...'}
         {!isLoading && !projects?.length && 'No hay proyectos disponibles'}
-        {!isLoading && projects && projects?.length > 0 && (
-          <ProjectTable projects={projects} />
+        {(isLoading || (projects && projects?.length > 0)) && (
+          <ProjectTable projects={projects} isLoading={isLoading} />
         )}
       </div>
     </div>

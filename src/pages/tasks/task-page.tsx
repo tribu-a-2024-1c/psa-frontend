@@ -9,12 +9,11 @@ import { TaskTable } from './task-table';
 
 export function TaskPage() {
   const [tasks, setTasks] = useState<Task[] | null>();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTask = () => {
-      setIsLoading(true);
       client.projects
         .get('/projects/tasks')
         .then((response) => {
@@ -42,10 +41,9 @@ export function TaskPage() {
             Crear Tarea
           </Button>
         </div>
-        {isLoading && 'Cargando tareas...'}
         {!isLoading && !tasks?.length && 'No hay tareas disponibles'}
-        {!isLoading && tasks && tasks?.length > 0 && (
-          <TaskTable tasks={tasks} />
+        {((tasks && tasks?.length > 0) || isLoading) && (
+          <TaskTable tasks={tasks} isLoading={isLoading} />
         )}
       </div>
     </div>

@@ -13,7 +13,13 @@ import { formatDate } from '@/utils';
 
 import { TABLE_COLUMNS } from './constants';
 
-export function ProjectTable({ projects }: { projects: Project[] }) {
+export function ProjectTable({
+  projects,
+  isLoading,
+}: {
+  projects: Project[] | null | undefined;
+  isLoading: boolean;
+}) {
   return (
     <div className="rounded-lg border bg-gray-100 shadow-sm dark:bg-gray-950">
       <Table>
@@ -25,21 +31,33 @@ export function ProjectTable({ projects }: { projects: Project[] }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {projects?.map((project: Project) => (
-            <TableRow key={project.id}>
-              <TableCell>{project?.id}</TableCell>
-              <TableCell>{project.title}</TableCell>
-              <TableCell>{project.description}</TableCell>
-              <TableCell>{formatDate(project.startDate)}</TableCell>
-              <TableCell>{formatDate(project.endDate)}</TableCell>
-              <TableCell>{project.status}</TableCell>
-              <TableCell>
-                <Link to="/tasks" className="underline">
-                  Ver tareas asociadas
-                </Link>
-              </TableCell>
-            </TableRow>
-          ))}
+          {isLoading
+            ? Array(5)
+                .fill(null)
+                .map((_, index) => (
+                  <TableRow key={index}>
+                    {TABLE_COLUMNS.map((_, idx) => (
+                      <TableCell key={idx}>
+                        <div className="h-6 w-full animate-pulse rounded bg-gray-300 dark:bg-gray-700"></div>
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+            : projects?.map((project: Project) => (
+                <TableRow key={project.id}>
+                  <TableCell>{project?.id}</TableCell>
+                  <TableCell>{project.title}</TableCell>
+                  <TableCell>{project.description}</TableCell>
+                  <TableCell>{formatDate(project.startDate)}</TableCell>
+                  <TableCell>{formatDate(project.endDate)}</TableCell>
+                  <TableCell>{project.status}</TableCell>
+                  <TableCell>
+                    <Link to="/tasks" className="underline">
+                      Ver tareas asociadas
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))}
         </TableBody>
       </Table>
     </div>
