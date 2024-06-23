@@ -11,6 +11,7 @@ import {
   ProjectPage,
   TaskPage,
 } from './pages';
+import { SupportPage } from './pages/support/support-page';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
             <Route path="/projects/new" element={<AddProjectPage />} />
             <Route path="/tasks" element={<TaskPage />} />
             <Route path="/tasks/new" element={<AddTaskPage />} />
+            <Route path="/tickets" element={<SupportPage />} />
           </Routes>
         </Layout>
       </BrowserRouter>
