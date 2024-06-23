@@ -24,3 +24,24 @@ export interface Task {
     description: string;
   };
 }
+
+export interface Ticket {
+  id: number;
+  title: string;
+  severity: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  type: string;
+  description: string;
+  priorityId: number;
+  clientId: number;
+  productId: number;
+  priority: Priority;
+}
+
+export interface Priority {
+  id: number;
+  name: string;
+  days: number;
+}
