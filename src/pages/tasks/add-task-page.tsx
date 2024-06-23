@@ -1,9 +1,10 @@
+import { useEffect, useState } from 'react';
 import type { Control, FieldValues } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
 import { client } from '@/api/common/client';
-import type { Project } from '@/api/types';
+import type { Project, Task } from '@/api/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -51,11 +52,16 @@ function FormTextarea({ id, label, placeholder, control }: FormTextareaProps) {
 interface FormSelectProps {
   id: string;
   label: string;
-  options: string[];
+  options: string[] | { value: string; label: string }[];
   control: Control<FieldValues>;
 }
 
 function FormSelect({ id, label, options, control }: FormSelectProps) {
+  const isComplexOptions = (
+    option: { value: string; label: string } | string,
+  ): option is { value: string; label: string } =>
+    typeof option === 'object' && 'value' in option && 'label' in option;
+
   return (
     <div className="grid gap-2">
       <Label htmlFor={id}>{label}</Label>
@@ -71,11 +77,17 @@ function FormSelect({ id, label, options, control }: FormSelectProps) {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>{label}</SelectLabel>
-                {options.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
+                {options.map((option) =>
+                  isComplexOptions(option) ? (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ) : (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ),
+                )}
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -122,10 +134,12 @@ export function AddTaskPage() {
     handleSubmit,
     formState: { isValid },
   } = useForm({ mode: 'onChange' });
+  const [projects, setProjects] = useState<Project[] | null>();
 
-  const createTask = (payload: Project) => {
+  const createTask = (payload: Task) => {
+    const { project, ...restPayload } = payload;
     client.projects
-      .post('/tasks', { ...payload })
+      .post(`/projects/${project}/tasks`, { ...restPayload })
       .then(() => {
         navigate('/tasks');
       })
@@ -134,8 +148,24 @@ export function AddTaskPage() {
       });
   };
 
+  useEffect(() => {
+    const fetchProjects = () => {
+      client.projects
+        .get('/projects')
+        .then((response) => {
+          setProjects(response.data);
+        })
+        .catch((error) => {
+          setProjects([]);
+          console.error('Error fetching projects:', error);
+        });
+    };
+
+    fetchProjects();
+  }, []);
+
   const onSubmit = (data: FieldValues) => {
-    createTask(data as Project);
+    createTask(data as Task);
   };
 
   return (
@@ -175,18 +205,34 @@ export function AddTaskPage() {
             options={TASK_STATES}
             control={control}
           />
-          <FormItem
-            id="estimation"
-            label="Estimación"
-            placeholder="Ingrese estimación de la tarea"
-            control={control}
-          />
-          <FormSelect
-            id="project"
-            label="Proyecto"
-            options={TASK_STATES}
-            control={control}
-          />
+          <div className="grid gap-2">
+            <Label htmlFor="estimation">Estimación</Label>
+            <Controller
+              name="estimation"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  id="estimation"
+                  type="number"
+                  placeholder="Ingrese estimación de la tarea"
+                  onChange={(e) => field.onChange(parseInt(e.target.value))}
+                />
+              )}
+            />
+          </div>
+          {projects && (
+            <FormSelect
+              id="project"
+              label="Proyecto"
+              options={projects.map((project) => ({
+                value: project.id.toString(),
+                label: project.title,
+              }))}
+              control={control}
+            />
+          )}
           <div className="mt-4 flex justify-end gap-2">
             <Button variant="secondary" onClick={() => navigate('/tasks')}>
               Cancelar
