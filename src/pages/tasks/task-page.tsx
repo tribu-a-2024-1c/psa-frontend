@@ -1,48 +1,112 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { client } from '@/api/common/client';
-import type { Task } from '@/api/types';
+import type { Project, Task } from '@/api/types';
 import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 import { TaskTable } from './task-table';
+
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
 
 export function TaskPage() {
   const [tasks, setTasks] = useState<Task[] | null>();
   const [isLoading, setIsLoading] = useState(true);
+  const [projects, setProjects] = useState<Project[]>([]);
   const navigate = useNavigate();
+  const query = useQuery();
+  const projectId = query.get('projectId');
 
   useEffect(() => {
-    const fetchTask = () => {
-      client.projects
-        .get('/projects/tasks')
-        .then((response) => {
-          setTasks(response.data);
-        })
-        .catch((error) => {
-          console.error('Error fetching tasks:', error);
-        })
-        .finally(() => setIsLoading(false));
+    client.projects
+      .get('/projects')
+      .then((response) => {
+        setProjects(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching projects:', error);
+      });
+  }, []);
+
+  useEffect(() => {
+    const fetchTasks = () => {
+      if (projectId === 'all' || !projectId) {
+        client.projects
+          .get('/projects/tasks')
+          .then((response) => {
+            setTasks(response.data);
+          })
+          .catch((error) => {
+            console.error('Error fetching tasks:', error);
+          })
+          .finally(() => setIsLoading(false));
+      } else {
+        setIsLoading(true);
+        client.projects
+          .get(`/projects/${projectId}/tasks`)
+          .then((response) => {
+            setTasks(response.data);
+          })
+          .catch((error) => {
+            console.error('Error fetching tasks:', error);
+          })
+          .finally(() => setIsLoading(false));
+      }
     };
 
-    fetchTask();
-  }, []);
+    fetchTasks();
+  }, [projectId]);
+
+  const handleProjectChange = (value: string) => {
+    navigate(`?projectId=${value}`);
+  };
 
   return (
     <div className="flex flex-1">
       <div className="flex-1 px-4 py-2">
-        <div className="mb-4 flex items-center">
+        <div className="mb-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Tareas</h1>
-          <Button
-            className="ml-auto"
-            size="sm"
-            onClick={() => navigate('/tasks/new')}
-          >
-            Crear Tarea
-          </Button>
+          <div className="flex gap-2">
+            <Select onValueChange={handleProjectChange}>
+              <SelectTrigger className="ml-auto w-[200px]">
+                <SelectValue placeholder="Seleccione un proyecto" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Proyecto</SelectLabel>
+                  <SelectItem value="all">Seleccione un proyecto</SelectItem>
+                  {projects.map((project) => (
+                    <SelectItem key={project.id} value={project.id.toString()}>
+                      {project.title}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <Button
+              className="ml-auto h-[40px]"
+              size="sm"
+              onClick={() => navigate('/tasks/new')}
+            >
+              Crear Tarea
+            </Button>
+          </div>
         </div>
-        {!isLoading && !tasks?.length && 'No hay tareas disponibles'}
-        {((tasks && tasks?.length > 0) || isLoading) && (
+        {!isLoading &&
+          (!tasks || tasks.length === 0) &&
+          'No hay tareas disponibles'}
+        {((tasks && tasks.length > 0) || isLoading) && (
           <TaskTable tasks={tasks} isLoading={isLoading} />
         )}
       </div>

@@ -52,7 +52,10 @@ export function ProjectTable({
                   <TableCell>{formatDate(project.endDate)}</TableCell>
                   <TableCell>{project.status}</TableCell>
                   <TableCell>
-                    <Link to="/tasks" className="underline">
+                    <Link
+                      to={`/tasks?projectId=${project.id}`}
+                      className="underline"
+                    >
                       Ver tareas asociadas
                     </Link>
                   </TableCell>

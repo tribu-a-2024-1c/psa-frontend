@@ -36,7 +36,7 @@ export function ProjectPage() {
         <div className="mb-4 flex items-center">
           <h1 className="text-2xl font-bold">Proyectos</h1>
           <Button
-            className="ml-auto"
+            className="ml-auto h-[40px]"
             size="sm"
             onClick={() => navigate('/projects/new')}
           >
