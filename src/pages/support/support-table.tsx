@@ -20,13 +20,7 @@ export function SupportTable({
   tickets: Ticket[] | null | undefined;
   isLoading: boolean;
 }) {
-  const sortedTickets = tickets
-    ? [...tickets].sort((a, b) => {
-        const idA = typeof a.id === 'number' ? a.id : parseInt(a.id, 10);
-        const idB = typeof b.id === 'number' ? b.id : parseInt(b.id, 10);
-        return idB - idA;
-      })
-    : [];
+  const sortedTickets = tickets ? [...tickets].sort((a, b) => b.id - a.id) : [];
 
   return (
     <div className="rounded-lg border bg-gray-100 shadow-sm dark:bg-gray-950">
@@ -46,7 +40,7 @@ export function SupportTable({
                   <TableRow key={index}>
                     {TABLE_COLUMNS.map((_, idx) => (
                       <TableCell key={idx}>
-                        <div className="h-6 w-full animate-pulse rounded bg-gray-300 dark:bg-gray-700"></div>
+                        <div className="h-6 w-full animate-pulse rounded bg-gray-300 !text-center dark:bg-gray-700"></div>
                       </TableCell>
                     ))}
                   </TableRow>
@@ -65,6 +59,14 @@ export function SupportTable({
                     {formatDate(ticket.endDate)}
                   </TableCell>
                   <TableCell className="text-center">{ticket.status}</TableCell>
+                  <TableCell className="text-center">
+                    {ticket.priority}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {ticket.resource?.name && ticket.resource?.lastName
+                      ? `${ticket.resource?.name} ${ticket.resource?.lastName}`
+                      : '-'}
+                  </TableCell>
                   <TableCell className="text-center">
                     <Link
                       to={`/tasks?ticketId=${ticket.id}`}
