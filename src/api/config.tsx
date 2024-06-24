@@ -1,10 +1,7 @@
+import { BriefcaseIcon, ListTodoIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 
-import {
-  BriefcaseIcon,
-  HomeIcon,
-  TicketIcon,
-} from '@/components/core/icons-core';
+import { HomeIcon, TicketIcon } from '@/components/core/icons-core';
 
 export type MenuItem = {
   title: string;
@@ -22,15 +19,21 @@ export const menuItems: MenuItem[] = [
     link: '/',
   },
   {
-    title: 'Projects',
-    description: 'Manage your projects',
+    title: 'Tickets',
+    description: 'Administra tus tickets',
+    icon: <TicketIcon className={ICON_SIZE_CLASS} />,
+    link: '/tickets',
+  },
+  {
+    title: 'Proyectos',
+    description: 'Administra tus proyectos',
     icon: <BriefcaseIcon className={ICON_SIZE_CLASS} />,
     link: '/projects',
   },
   {
-    title: 'Tickets',
-    description: 'Manage your tickets',
-    icon: <TicketIcon className={ICON_SIZE_CLASS} />,
-    link: '/tickets',
+    title: 'Tareas',
+    description: 'Administra tus tareas',
+    icon: <ListTodoIcon className={ICON_SIZE_CLASS} />,
+    link: '/tasks',
   },
 ];
