@@ -12,6 +12,10 @@ const psaService = axios.create({
   baseURL: 'https://run.mocky.io/v3',
 });
 
+const clientService = axios.create({
+  baseURL: 'https://run.mocky.io/v3',
+});
+
 projectsService.defaults.headers.common['projects-Type'] = 'application/json';
 projectsService.defaults.headers.common.Accept = 'application/json';
 
@@ -21,8 +25,12 @@ supportService.defaults.headers.common.Accept = 'application/json';
 psaService.defaults.headers.common['projects-Type'] = 'application/json';
 psaService.defaults.headers.common.Accept = 'application/json';
 
+clientService.defaults.headers.common['projects-Type'] = 'application/json';
+clientService.defaults.headers.common.Accept = 'application/json';
+
 export const client = {
   projects: projectsService,
   support: supportService,
   psa: psaService,
+  client: clientService,
 };
