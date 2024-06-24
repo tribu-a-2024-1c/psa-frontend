@@ -37,6 +37,62 @@ interface FormSelectResourceProps {
   control: Control<FieldValues>;
 }
 
+interface FormSelectProjectProps {
+  id: string;
+  label: string;
+  options: Project[];
+  control: Control<FieldValues>;
+}
+
+function FormSelectProject({
+  id,
+  label,
+  options = [],
+  control,
+}: FormSelectProjectProps) {
+  const safeOptions = Array.isArray(options) ? options : [];
+
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor={id}>{label}</Label>
+      <Controller
+        name={id}
+        control={control}
+        render={({ field }) => (
+          <Select
+            {...field}
+            onValueChange={(value) => {
+              try {
+                field.onChange(JSON.parse(value));
+              } catch (error) {
+                console.error('Invalid JSON:', value, error);
+              }
+            }}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder={`Seleccionar ${label.toLowerCase()}`}>
+                {field.value
+                  ? field.value.title
+                  : `Seleccionar ${label.toLowerCase()}`}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>{label}</SelectLabel>
+                {safeOptions.map((option) => (
+                  <SelectItem key={option.id} value={JSON.stringify(option)}>
+                    {option.title}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        )}
+      />
+    </div>
+  );
+}
+
 function FormSelectResource({
   id,
   label,
@@ -110,21 +166,19 @@ function FormTextarea({ id, label, placeholder, control }: FormTextareaProps) {
   );
 }
 
-interface FormSelectProps {
+interface FormSelectStatusProps {
   id: string;
   label: string;
-  options: string[] | { value: string; label: string }[];
+  options: string[];
   control: Control<FieldValues>;
 }
 
-function FormSelect({ id, label, options = [], control }: FormSelectProps) {
-  const isComplexOptions = (
-    option: { value: string; label: string } | string,
-  ): option is { value: string; label: string } =>
-    typeof option === 'object' && 'value' in option && 'label' in option;
-
-  const safeOptions = Array.isArray(options) ? options : [];
-
+function FormSelectStatus({
+  id,
+  label,
+  options = [],
+  control,
+}: FormSelectStatusProps) {
   return (
     <div className="grid gap-2">
       <Label htmlFor={id}>{label}</Label>
@@ -133,24 +187,21 @@ function FormSelect({ id, label, options = [], control }: FormSelectProps) {
         control={control}
         rules={{ required: true }}
         render={({ field }) => (
-          <Select {...field} onValueChange={field.onChange}>
+          <Select
+            value={field.value}
+            onValueChange={(value) => field.onChange(value)}
+          >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder={`Seleccionar ${label.toLowerCase()}`} />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>{label}</SelectLabel>
-                {safeOptions?.map((option) =>
-                  isComplexOptions(option) ? (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ) : (
-                    <SelectItem key={option} value={option}>
-                      {option}
-                    </SelectItem>
-                  ),
-                )}
+                {options?.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -209,7 +260,7 @@ export function AddTaskPage() {
   const createTask = (payload: Task) => {
     const { project, resource, ...restPayload } = payload;
     client.projects
-      .post(`/projects/${project}/tasks`, {
+      .post(`/projects/${project.id}/tasks`, {
         ...restPayload,
         ...(resource
           ? {
@@ -268,12 +319,7 @@ export function AddTaskPage() {
                 return;
               }
 
-              if (
-                key !== 'id' &&
-                key !== 'project' &&
-                key !== 'resource' &&
-                key !== 'ticket'
-              ) {
+              if (key !== 'id' && key !== 'resource' && key !== 'ticket') {
                 setValue(key, value);
               }
             });
@@ -283,7 +329,6 @@ export function AddTaskPage() {
               Nombre: foundTask.resource.name,
               Apellido: foundTask.resource.lastName,
             });
-            setValue('project', foundTask.project.id.toString());
           }
         })
         .catch((error) => {
@@ -370,7 +415,7 @@ export function AddTaskPage() {
             placeholder="Ingrese fecha de finalización"
             control={control}
           />
-          <FormSelect
+          <FormSelectStatus
             id="status"
             label="Estado"
             options={TASK_STATES}
@@ -394,13 +439,10 @@ export function AddTaskPage() {
             />
           </div>
           {projects && (
-            <FormSelect
+            <FormSelectProject
               id="project"
               label="Proyecto"
-              options={projects?.map((project) => ({
-                value: project.id.toString(),
-                label: project.title,
-              }))}
+              options={projects}
               control={control}
             />
           )}
