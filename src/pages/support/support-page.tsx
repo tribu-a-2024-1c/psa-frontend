@@ -29,6 +29,7 @@ export function SupportPage() {
   const query = useQuery();
   const productId = query.get('productId');
   const resourceId = query.get('resourceId');
+  const status = query.get('status');
 
   useEffect(() => {
     client.support
@@ -80,6 +81,10 @@ export function SupportPage() {
     navigate(`?resourceId=${value}`);
   };
 
+  const handleStatusChange = (value: string) => {
+    navigate(`?status=${value}`);
+  };
+
   const filteredTickets = tickets?.filter((ticket) => {
     const matchesProduct =
       productId && productId !== 'all'
@@ -89,7 +94,9 @@ export function SupportPage() {
       resourceId && resourceId !== 'all'
         ? ticket.resource?.id.toString() === resourceId
         : true;
-    return matchesProduct && matchesResource;
+    const matchesStatus =
+      status && status !== 'all' ? ticket.status === status : true;
+    return matchesProduct && matchesResource && matchesStatus;
   });
 
   return (
@@ -133,6 +140,23 @@ export function SupportPage() {
                       {resource.name} {resource.lastName}
                     </SelectItem>
                   ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <Select
+              onValueChange={handleStatusChange}
+              defaultValue={status || 'all'}
+            >
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Seleccione un estado" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Estado</SelectLabel>
+                  <SelectItem value="all">Todos los estados</SelectItem>
+                  <SelectItem value="Abierto">Abierto</SelectItem>
+                  <SelectItem value="En Progreso">En Progreso</SelectItem>
+                  <SelectItem value="Cerrado">Cerrado</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>

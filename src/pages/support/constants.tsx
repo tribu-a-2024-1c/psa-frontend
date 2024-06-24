@@ -1,11 +1,12 @@
 export const TABLE_COLUMNS = [
   'ID',
-  'Título',
+  'Nombre',
   'Descripción',
   'Fecha de Inicio',
   'Fecha de Finalización',
   'Estado',
-  'Acciones',
+  'Severidad',
+  'Producto',
+  'Clasificación',
+  'Recurso',
 ];
-
-export const TICKET_STATES = ['No Comenzado', 'En Progreso', 'Finalizado'];

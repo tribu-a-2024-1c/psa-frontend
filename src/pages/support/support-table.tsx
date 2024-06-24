@@ -30,6 +30,7 @@ export function SupportTable({
             {TABLE_COLUMNS.map((column) => (
               <TableHead key={column}>{column}</TableHead>
             ))}
+            <TableHead>Acciones</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -43,6 +44,9 @@ export function SupportTable({
                         <div className="h-6 w-full animate-pulse rounded bg-gray-300 !text-center dark:bg-gray-700"></div>
                       </TableCell>
                     ))}
+                    <TableCell>
+                      <div className="h-6 w-full animate-pulse rounded bg-gray-300 dark:bg-gray-700"></div>
+                    </TableCell>
                   </TableRow>
                 ))
             : sortedTickets?.map((ticket: Ticket) => (
@@ -60,20 +64,32 @@ export function SupportTable({
                   </TableCell>
                   <TableCell className="text-center">{ticket.status}</TableCell>
                   <TableCell className="text-center">
-                    {ticket.priority}
+                    {ticket.severity}
                   </TableCell>
+                  <TableCell className="text-center">
+                    {ticket.productVersion.product.name}
+                  </TableCell>
+                  <TableCell className="text-center">{ticket.type}</TableCell>
                   <TableCell className="text-center">
                     {ticket.resource?.name && ticket.resource?.lastName
                       ? `${ticket.resource?.name} ${ticket.resource?.lastName}`
                       : '-'}
                   </TableCell>
                   <TableCell className="text-center">
-                    <Link
-                      to={`/tasks?ticketId=${ticket.id}`}
-                      className="underline"
-                    >
-                      Ver tareas asociadas
-                    </Link>
+                    <div className="flex flex-col gap-2">
+                      <Link
+                        to={`/tasks?ticketId=${ticket.id}`}
+                        className="underline"
+                      >
+                        Ver tareas asociadas
+                      </Link>
+                      <Link
+                        to={`/tickets/edit/${ticket.id}`}
+                        className="underline"
+                      >
+                        Editar tarea
+                      </Link>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
