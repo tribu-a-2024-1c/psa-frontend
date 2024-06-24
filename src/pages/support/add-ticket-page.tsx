@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { client } from '@/api/common/client';
 import {
   type Client,
+  type CreateTicketPayload,
   Priority,
   type ProductWithVersion,
   type Task,
@@ -140,7 +141,10 @@ export function AddTicketPage() {
   const [selectedProductClients, setSelectedProductClients] = useState<
     Client[]
   >([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [selectedProductVersionId, setSelectedProductVersionId] = useState<
+    number | null
+  >(null);
+  const [_, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   const {
@@ -177,12 +181,21 @@ export function AddTicketPage() {
     const product = products.find(
       (p) => p.name === name && p.version === version,
     );
-    setSelectedProductClients(product ? product.clients : []);
+    if (product) {
+      setSelectedProductClients(product.clients);
+      setSelectedProductVersionId(product.id);
+    } else {
+      setSelectedProductClients([]);
+      setSelectedProductVersionId(null);
+    }
   };
 
-  const createTicket = (payload: any) => {
+  const createTicket = (payload: CreateTicketPayload) => {
     client.support
-      .post('/tickets', { ...payload })
+      .post('/tickets', {
+        ...payload,
+        productVersionId: selectedProductVersionId,
+      })
       .then(() => {
         navigate('/tickets');
       })
@@ -192,7 +205,22 @@ export function AddTicketPage() {
   };
 
   const onSubmit = (data: FieldValues) => {
-    createTicket(data);
+    const { taskIds, ...rest } = data as CreateTicketPayload;
+
+    // Ensure taskIds are treated as strings and then converted to numbers
+    const numericTaskIds = taskIds?.map(Number);
+
+    // Ensure productVersionId is not null before creating the payload
+    if (selectedProductVersionId !== null) {
+      const payload: CreateTicketPayload = {
+        ...rest,
+        taskIds: numericTaskIds,
+        productVersionId: selectedProductVersionId,
+      };
+      createTicket(payload);
+    } else {
+      console.error('Product version ID is required');
+    }
   };
 
   const productOptions = products.map(

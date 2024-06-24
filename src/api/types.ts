@@ -73,3 +73,16 @@ export interface ProductWithVersion {
   version: string;
   clients: Client[];
 }
+
+export interface CreateTicketPayload {
+  title: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  type: string;
+  description: string;
+  priority: string;
+  productVersionId: number;
+  resourceId?: number;
+  taskIds?: number[];
+}
