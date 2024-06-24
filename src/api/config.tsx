@@ -1,4 +1,4 @@
-import { BriefcaseIcon, ListTodoIcon } from 'lucide-react';
+import { BriefcaseIcon, ListTodoIcon, PackageSearchIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 import { HomeIcon, TicketIcon } from '@/components/core/icons-core';
@@ -23,6 +23,12 @@ export const menuItems: MenuItem[] = [
     description: 'Administra tus tickets',
     icon: <TicketIcon className={ICON_SIZE_CLASS} />,
     link: '/tickets',
+  },
+  {
+    title: 'Productos',
+    description: 'Administra tus productos',
+    icon: <PackageSearchIcon className={ICON_SIZE_CLASS} />,
+    link: '/products',
   },
   {
     title: 'Proyectos',

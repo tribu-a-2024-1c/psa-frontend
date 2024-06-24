@@ -11,6 +11,7 @@ import {
   ProjectPage,
   TaskPage,
 } from './pages';
+import { ProductsPage } from './pages/products/products-page';
 import { AddTicketPage } from './pages/support/add-ticket-page';
 import { SupportPage } from './pages/support/support-page';
 
@@ -26,6 +27,7 @@ function App() {
             <Route path="/tasks" element={<TaskPage />} />
             <Route path="/tasks/new" element={<AddTaskPage />} />
             <Route path="/tickets" element={<SupportPage />} />
+            <Route path="/products" element={<ProductsPage />} />
             <Route path="/tickets/new" element={<AddTicketPage />} />
             <Route
               path="/tasks/edit/:projectId/:taskId"
