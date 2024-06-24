@@ -40,7 +40,7 @@ interface FormSelectResourceProps {
 function FormSelectResource({
   id,
   label,
-  options,
+  options = [],
   control,
 }: FormSelectResourceProps) {
   return (
@@ -64,7 +64,7 @@ function FormSelectResource({
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>{label}</SelectLabel>
-                {options.map((option) => (
+                {options?.map((option) => (
                   <SelectItem
                     key={option.legajo}
                     value={JSON.stringify(option)}
@@ -109,7 +109,7 @@ interface FormSelectProps {
   control: Control<FieldValues>;
 }
 
-function FormSelect({ id, label, options, control }: FormSelectProps) {
+function FormSelect({ id, label, options = [], control }: FormSelectProps) {
   const isComplexOptions = (
     option: { value: string; label: string } | string,
   ): option is { value: string; label: string } =>
@@ -130,7 +130,7 @@ function FormSelect({ id, label, options, control }: FormSelectProps) {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>{label}</SelectLabel>
-                {options.map((option) =>
+                {options?.map((option) =>
                   isComplexOptions(option) ? (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
@@ -193,8 +193,8 @@ export function AddTaskPage() {
     taskId?: string;
   }>();
 
-  const [projects, setProjects] = useState<Project[] | null>();
-  const [resources, setResources] = useState<Resource[] | null>();
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [resources, setResources] = useState<Resource[]>([]);
 
   const createTask = (payload: Task) => {
     const { project, resource, ...restPayload } = payload;
@@ -379,7 +379,7 @@ export function AddTaskPage() {
             <FormSelect
               id="project"
               label="Proyecto"
-              options={projects.map((project) => ({
+              options={projects?.map((project) => ({
                 value: project.id.toString(),
                 label: project.title,
               }))}
