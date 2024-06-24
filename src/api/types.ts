@@ -38,15 +38,26 @@ export interface Resource {
 export interface Ticket {
   id: number;
   title: string;
-  severity: string;
+  severity: string | null;
   startDate: string;
   endDate: string;
   status: string;
   type: TicketType;
   description: string;
-  productName: number;
-  clientName: string;
-  priority: Priority;
+  productVersion: {
+    id: number;
+    version: string;
+    product: {
+      id: number;
+      name: string;
+    };
+  };
+  resource?: {
+    id: number;
+    name: string;
+    lastName: string;
+  } | null;
+  priority?: Priority;
 }
 
 export enum TicketType {

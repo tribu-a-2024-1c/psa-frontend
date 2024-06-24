@@ -56,7 +56,12 @@ export function SupportPage() {
       .get<Resource[]>('/af2aa06e-6191-4590-af70-bfa08ef85b93')
       .then((response) => {
         if (Array.isArray(response?.data)) {
-          setResources(response.data);
+          const normalizedResources = response.data.map((resource) => ({
+            id: resource.legajo,
+            name: resource.Nombre,
+            lastName: resource.Apellido,
+          }));
+          setResources(normalizedResources);
         } else {
           setResources([]);
         }
