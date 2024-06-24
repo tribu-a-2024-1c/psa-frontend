@@ -14,20 +14,16 @@ export function ProjectPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchProjects = () => {
-      client.projects
-        .get('/projects')
-        .then((response) => {
-          setProjects(response.data);
-        })
-        .catch((error) => {
-          setProjects([]);
-          console.error('Error fetching projects:', error);
-        })
-        .finally(() => setIsLoading(false));
-    };
-
-    fetchProjects();
+    client.projects
+      .get('/projects')
+      .then((response) => {
+        setProjects(response.data);
+      })
+      .catch((error) => {
+        setProjects([]);
+        console.error('Error fetching projects:', error);
+      })
+      .finally(() => setIsLoading(false));
   }, []);
 
   return (

@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 import type { Task } from '@/api/types';
 import {
   Table,
@@ -18,6 +20,8 @@ export function TaskTable({
   tasks: Task[] | null | undefined;
   isLoading: boolean;
 }) {
+  const sortedTasks = tasks ? [...tasks].sort((a, b) => b.id - a.id) : [];
+
   return (
     <div className="rounded-lg border bg-gray-100 shadow-sm dark:bg-gray-950">
       <Table>
@@ -36,21 +40,41 @@ export function TaskTable({
                   <TableRow key={index}>
                     {TABLE_COLUMNS.map((_, idx) => (
                       <TableCell key={idx}>
-                        <div className="h-6 w-full animate-pulse rounded bg-gray-300 dark:bg-gray-700"></div>
+                        <div className="h-6 w-full animate-pulse rounded bg-gray-300 !text-center dark:bg-gray-700"></div>
                       </TableCell>
                     ))}
                   </TableRow>
                 ))
-            : tasks?.map((task: Task) => (
+            : sortedTasks?.map((task: Task) => (
                 <TableRow key={task.id}>
-                  <TableCell>{task?.id}</TableCell>
-                  <TableCell>{task.title}</TableCell>
-                  <TableCell>{task.description}</TableCell>
-                  <TableCell>{formatDate(task.startDate)}</TableCell>
-                  <TableCell>{formatDate(task.endDate)}</TableCell>
-                  <TableCell>{task.status}</TableCell>
-                  <TableCell>{task.estimation}</TableCell>
-                  <TableCell>{task.project.title}</TableCell>
+                  <TableCell className="text-center">{task?.id}</TableCell>
+                  <TableCell className="text-center">{task.title}</TableCell>
+                  <TableCell className="max-w-[200px] truncate text-center">
+                    {task.description}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {formatDate(task.startDate)}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {formatDate(task.endDate)}
+                  </TableCell>
+                  <TableCell className="text-center">{task.status}</TableCell>
+                  <TableCell className="text-center">
+                    {task.estimation}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {task.project.title}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {task.resource?.name && task.resource?.lastName
+                      ? `${task.resource?.name} ${task.resource?.lastName}`
+                      : '-'}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Link to={`/tasks/edit/${task.id}`} className="underline">
+                      Editar tarea
+                    </Link>
+                  </TableCell>
                 </TableRow>
               ))}
         </TableBody>

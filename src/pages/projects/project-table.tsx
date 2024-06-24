@@ -20,6 +20,14 @@ export function ProjectTable({
   projects: Project[] | null | undefined;
   isLoading: boolean;
 }) {
+  const sortedProjects = projects
+    ? [...projects].sort((a, b) => {
+        const idA = typeof a.id === 'number' ? a.id : parseInt(a.id, 10);
+        const idB = typeof b.id === 'number' ? b.id : parseInt(b.id, 10);
+        return idB - idA;
+      })
+    : [];
+
   return (
     <div className="rounded-lg border bg-gray-100 shadow-sm dark:bg-gray-950">
       <Table>
@@ -43,15 +51,23 @@ export function ProjectTable({
                     ))}
                   </TableRow>
                 ))
-            : projects?.map((project: Project) => (
+            : sortedProjects?.map((project: Project) => (
                 <TableRow key={project.id}>
-                  <TableCell>{project?.id}</TableCell>
-                  <TableCell>{project.title}</TableCell>
-                  <TableCell>{project.description}</TableCell>
-                  <TableCell>{formatDate(project.startDate)}</TableCell>
-                  <TableCell>{formatDate(project.endDate)}</TableCell>
-                  <TableCell>{project.status}</TableCell>
-                  <TableCell>
+                  <TableCell className="text-center">{project?.id}</TableCell>
+                  <TableCell className="text-center">{project.title}</TableCell>
+                  <TableCell className="max-w-[200px] truncate text-center">
+                    {project.description}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {formatDate(project.startDate)}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {formatDate(project.endDate)}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {project.status}
+                  </TableCell>
+                  <TableCell className="text-center">
                     <Link
                       to={`/tasks?projectId=${project.id}`}
                       className="underline"

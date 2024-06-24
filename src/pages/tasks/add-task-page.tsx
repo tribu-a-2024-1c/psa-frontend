@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { client } from '@/api/common/client';
 import type { Project, Task } from '@/api/types';
+import type { Resource } from '@/api/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -26,6 +27,57 @@ interface FormTextareaProps {
   label: string;
   placeholder: string;
   control: Control<FieldValues>;
+}
+
+interface FormSelectResourceProps {
+  id: string;
+  label: string;
+  options: Resource[];
+  control: Control<FieldValues>;
+}
+
+function FormSelectResource({
+  id,
+  label,
+  options,
+  control,
+}: FormSelectResourceProps) {
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor={id}>{label}</Label>
+      <Controller
+        name={id}
+        control={control}
+        render={({ field }) => (
+          <Select
+            {...field}
+            onValueChange={(value) => field.onChange(JSON.parse(value))}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder={`Seleccionar ${label.toLowerCase()}`}>
+                {field.value
+                  ? `${field.value.Nombre} ${field.value.Apellido}`
+                  : `Seleccionar ${label.toLowerCase()}`}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>{label}</SelectLabel>
+                {options.map((option) => (
+                  <SelectItem
+                    key={option.legajo}
+                    value={JSON.stringify(option)}
+                  >
+                    {`${option.Nombre} ${option.Apellido}`}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        )}
+      />
+    </div>
+  );
 }
 
 function FormTextarea({ id, label, placeholder, control }: FormTextareaProps) {
@@ -135,11 +187,23 @@ export function AddTaskPage() {
     formState: { isValid },
   } = useForm({ mode: 'onChange' });
   const [projects, setProjects] = useState<Project[] | null>();
+  const [resources, setResources] = useState<Resource[] | null>();
 
   const createTask = (payload: Task) => {
-    const { project, ...restPayload } = payload;
+    const { project, resource, ...restPayload } = payload;
     client.projects
-      .post(`/projects/${project}/tasks`, { ...restPayload })
+      .post(`/projects/${project}/tasks`, {
+        ...restPayload,
+        ...(resource
+          ? {
+              recurso: {
+                legajo: resource.legajo,
+                nombre: resource.Nombre,
+                apellido: resource.Apellido,
+              },
+            }
+          : {}),
+      })
       .then(() => {
         navigate('/tasks');
       })
@@ -161,7 +225,20 @@ export function AddTaskPage() {
         });
     };
 
+    const fetchResources = () => {
+      client.psa
+        .get('/af2aa06e-6191-4590-af70-bfa08ef85b93')
+        .then((response) => {
+          setResources(response?.data);
+        })
+        .catch((error) => {
+          setResources([]);
+          console.error('Error fetching resources:', error);
+        });
+    };
+
     fetchProjects();
+    fetchResources();
   }, []);
 
   const onSubmit = (data: FieldValues) => {
@@ -230,6 +307,14 @@ export function AddTaskPage() {
                 value: project.id.toString(),
                 label: project.title,
               }))}
+              control={control}
+            />
+          )}
+          {resources && (
+            <FormSelectResource
+              id="resource"
+              label="Recurso"
+              options={resources}
               control={control}
             />
           )}
