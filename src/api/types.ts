@@ -23,6 +23,16 @@ export interface Task {
     status: string;
     description: string;
   };
+  resource?: Resource;
+}
+
+export interface Resource {
+  legajo?: number;
+  Nombre?: string;
+  Apellido?: string;
+  id?: number;
+  lastName?: string;
+  name?: string;
 }
 
 export interface Ticket {
