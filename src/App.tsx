@@ -23,6 +23,10 @@ function App() {
             <Route path="/projects/new" element={<AddProjectPage />} />
             <Route path="/tasks" element={<TaskPage />} />
             <Route path="/tasks/new" element={<AddTaskPage />} />
+            <Route
+              path="/tasks/edit/:projectId/:taskId"
+              element={<AddTaskPage />}
+            />
           </Routes>
         </Layout>
       </BrowserRouter>

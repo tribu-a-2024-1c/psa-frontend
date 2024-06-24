@@ -71,7 +71,10 @@ export function TaskTable({
                       : '-'}
                   </TableCell>
                   <TableCell className="text-center">
-                    <Link to={`/tasks/edit/${task.id}`} className="underline">
+                    <Link
+                      to={`/tasks/edit/${task.project.id}/${task.id}`}
+                      className="underline"
+                    >
                       Editar tarea
                     </Link>
                   </TableCell>

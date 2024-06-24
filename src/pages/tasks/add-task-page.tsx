@@ -1,7 +1,8 @@
+import moment from 'moment';
 import { useEffect, useState } from 'react';
 import type { Control, FieldValues } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { client } from '@/api/common/client';
 import type { Project, Task } from '@/api/types';
@@ -184,8 +185,14 @@ export function AddTaskPage() {
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { isValid },
   } = useForm({ mode: 'onChange' });
+  const { projectId, taskId } = useParams<{
+    projectId?: string;
+    taskId?: string;
+  }>();
+
   const [projects, setProjects] = useState<Project[] | null>();
   const [resources, setResources] = useState<Resource[] | null>();
 
@@ -211,6 +218,69 @@ export function AddTaskPage() {
         console.error('Error fetching projects:', error);
       });
   };
+
+  const editTask = (payload: Task) => {
+    // eslint-disable-next-line unused-imports/no-unused-vars
+    const { project, resource, ...restPayload } = payload;
+    client.projects
+      .put(`/projects/tasks/${taskId}`, {
+        ...restPayload,
+        ...(resource
+          ? {
+              recurso: {
+                legajo: resource.legajo,
+                nombre: resource.Nombre,
+                apellido: resource.Apellido,
+              },
+            }
+          : {}),
+      })
+      .then(() => {
+        navigate('/tasks');
+      })
+      .catch((error) => {
+        console.error('Error fetching projects:', error);
+      });
+  };
+
+  useEffect(() => {
+    if (projectId && taskId) {
+      client.projects
+        .get(`/projects/${projectId}/tasks`)
+        .then((response) => {
+          const foundTask = response.data.find(
+            (task: Task) => task.id === parseInt(taskId),
+          );
+          if (foundTask) {
+            Object.entries(foundTask).forEach(([key, value]) => {
+              if (key === 'startDate' || key === 'endDate') {
+                setValue(key, moment.utc(value as string).format('YYYY-MM-DD'));
+                return;
+              }
+
+              if (
+                key !== 'id' &&
+                key !== 'project' &&
+                key !== 'resource' &&
+                key !== 'ticket'
+              ) {
+                setValue(key, value);
+              }
+            });
+
+            setValue('resource', {
+              legajo: foundTask.resource.id,
+              Nombre: foundTask.resource.name,
+              Apellido: foundTask.resource.lastName,
+            });
+            setValue('project', foundTask.project.id.toString());
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching tasks:', error);
+        });
+    }
+  }, [projectId, taskId, setValue]);
 
   useEffect(() => {
     const fetchProjects = () => {
@@ -242,13 +312,19 @@ export function AddTaskPage() {
   }, []);
 
   const onSubmit = (data: FieldValues) => {
-    createTask(data as Task);
+    if (projectId && taskId) {
+      editTask(data as Task);
+    } else {
+      createTask(data as Task);
+    }
   };
 
   return (
     <div className="flex flex-1">
       <div className="flex-1 bg-gray-100 p-4 dark:bg-gray-950 md:p-6">
-        <h1 className="mb-4 text-2xl font-bold">Crear Tarea Nueva</h1>
+        <h1 className="mb-4 text-2xl font-bold">
+          {projectId && taskId ? 'Editar Tarea' : 'Crear Tarea'}
+        </h1>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
           <FormItem
             id="title"
@@ -323,7 +399,7 @@ export function AddTaskPage() {
               Cancelar
             </Button>
             <Button type="submit" disabled={!isValid}>
-              Agregar
+              {projectId && taskId ? 'Editar' : 'Crear'}
             </Button>
           </div>
         </form>
