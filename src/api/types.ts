@@ -32,16 +32,21 @@ export interface Ticket {
   startDate: string;
   endDate: string;
   status: string;
-  type: string;
+  type: TicketType;
   description: string;
-  priorityId: number;
-  clientId: number;
-  productId: number;
+  productName: number;
+  clientName: string;
   priority: Priority;
 }
 
-export interface Priority {
-  id: number;
-  name: string;
-  days: number;
+export enum TicketType {
+  ERROR = 'ERROR',
+  CONSULTA = 'CONSULTA',
+}
+
+export enum Priority {
+  S1 = '7 dias',
+  S2 = '15 dias',
+  S3 = '30 dias',
+  S4 = '60 dias',
 }

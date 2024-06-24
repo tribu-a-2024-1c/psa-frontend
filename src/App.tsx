@@ -11,6 +11,7 @@ import {
   ProjectPage,
   TaskPage,
 } from './pages';
+import { AddTicketPage } from './pages/support/add-ticket-page';
 import { SupportPage } from './pages/support/support-page';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
             <Route path="/tasks" element={<TaskPage />} />
             <Route path="/tasks/new" element={<AddTaskPage />} />
             <Route path="/tickets" element={<SupportPage />} />
+            <Route path="/tickets/new" element={<AddTicketPage />} />
           </Routes>
         </Layout>
       </BrowserRouter>
