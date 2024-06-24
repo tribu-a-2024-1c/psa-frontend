@@ -1,9 +1,10 @@
+import { useEffect, useState } from 'react';
 import type { Control, FieldValues } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
 import { client } from '@/api/common/client';
-import type { Project } from '@/api/types';
+import type { Project, Resource } from '@/api/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -85,6 +86,71 @@ function FormSelect({ id, label, options, control }: FormSelectProps) {
   );
 }
 
+interface FormSelectResourceProps {
+  id: string;
+  label: string;
+  options: Resource[];
+  control: Control<FieldValues>;
+  setValue: (name: string, value: any) => void;
+  getValues: () => any;
+}
+
+function FormSelectResource({
+  id,
+  label,
+  options = [],
+  control,
+  setValue,
+  getValues,
+}: FormSelectResourceProps) {
+  const safeOptions = Array.isArray(options) ? options : [];
+
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor={id}>{label}</Label>
+      <Controller
+        name={id}
+        control={control}
+        render={({ field }) => (
+          <Select
+            value={JSON.stringify(field.value)}
+            onValueChange={(value) => {
+              try {
+                const resource = JSON.parse(value);
+                field.onChange(resource);
+                setValue('leader', resource);
+              } catch (error) {
+                console.error('Invalid JSON:', value, error);
+              }
+            }}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder={`Seleccionar ${label.toLowerCase()}`}>
+                {getValues('leader')
+                  ? `${getValues('leader').Nombre} ${getValues('leader').Apellido}`
+                  : `Seleccionar ${label.toLowerCase()}`}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>{label}</SelectLabel>
+                {safeOptions.map((option) => (
+                  <SelectItem
+                    key={option.legajo}
+                    value={JSON.stringify(option)}
+                  >
+                    {`${option.Nombre} ${option.Apellido}`}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        )}
+      />
+    </div>
+  );
+}
+
 interface FormItemProps {
   id: string;
   label: string;
@@ -120,8 +186,28 @@ export function AddProjectPage() {
   const {
     control,
     handleSubmit,
+    setValue,
+    getValues,
     formState: { isValid },
   } = useForm({ mode: 'onChange' });
+
+  const [resources, setResources] = useState<Resource[]>([]);
+
+  useEffect(() => {
+    client.psa
+      .get<Resource[]>('/af2aa06e-6191-4590-af70-bfa08ef85b93')
+      .then((response) => {
+        if (Array.isArray(response?.data)) {
+          setResources(response.data);
+        } else {
+          setResources([]);
+        }
+      })
+      .catch((error) => {
+        setResources([]);
+        console.error('Error fetching resources:', error);
+      });
+  }, []);
 
   const createProject = (payload: Project) => {
     client.projects
@@ -130,12 +216,17 @@ export function AddProjectPage() {
         navigate('/projects');
       })
       .catch((error) => {
-        console.error('Error fetching projects:', error);
+        console.error('Error creating project:', error);
       });
   };
 
   const onSubmit = (data: FieldValues) => {
-    createProject(data as Project);
+    const leader = getValues('leader');
+    const payload: Project = {
+      ...data,
+      leader,
+    };
+    createProject(payload);
   };
 
   return (
@@ -174,6 +265,14 @@ export function AddProjectPage() {
             label="Estado"
             options={PROJECT_STATES}
             control={control}
+          />
+          <FormSelectResource
+            id="leader"
+            label="Líder"
+            options={resources}
+            control={control}
+            setValue={setValue}
+            getValues={getValues}
           />
           <div className="mt-4 flex justify-end gap-2">
             <Button variant="secondary" onClick={() => navigate('/projects')}>
