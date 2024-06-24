@@ -5,7 +5,7 @@ const projectsService = axios.create({
 });
 
 const supportService = axios.create({
-  baseURL: `${import.meta.env.API_SUPORT_URL}`,
+  baseURL: `${import.meta.env.VITE_API_SUPPORT_URL}`,
 });
 
 const psaService = axios.create({

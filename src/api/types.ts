@@ -34,3 +34,29 @@ export interface Resource {
   lastName?: string;
   name?: string;
 }
+
+export interface Ticket {
+  id: number;
+  title: string;
+  severity: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  type: TicketType;
+  description: string;
+  productName: number;
+  clientName: string;
+  priority: Priority;
+}
+
+export enum TicketType {
+  ERROR = 'ERROR',
+  CONSULTA = 'CONSULTA',
+}
+
+export enum Priority {
+  S1 = '7 dias',
+  S2 = '15 dias',
+  S3 = '30 dias',
+  S4 = '60 dias',
+}
