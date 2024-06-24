@@ -84,5 +84,10 @@ export interface CreateTicketPayload {
   priority: string;
   productVersionId: number;
   resourceId?: number;
+  resource?: {
+    legajo: number;
+    nombre: string;
+    apellido: string;
+  };
   taskIds?: number[];
 }

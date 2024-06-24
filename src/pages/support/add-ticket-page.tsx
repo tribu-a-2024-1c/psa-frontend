@@ -9,6 +9,7 @@ import {
   type CreateTicketPayload,
   Priority,
   type ProductWithVersion,
+  type Resource,
   type Task,
 } from '@/api/types';
 import { Button } from '@/components/ui/button';
@@ -138,6 +139,7 @@ function FormItem({
 export function AddTicketPage() {
   const [products, setProducts] = useState<ProductWithVersion[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [resources, setResources] = useState<Resource[]>([]);
   const [selectedProductClients, setSelectedProductClients] = useState<
     Client[]
   >([]);
@@ -174,6 +176,20 @@ export function AddTicketPage() {
         setTasks([]);
         console.error('Error fetching tasks:', error);
       });
+
+    client.psa
+      .get<Resource[]>('/af2aa06e-6191-4590-af70-bfa08ef85b93')
+      .then((response) => {
+        if (Array.isArray(response?.data)) {
+          setResources(response.data);
+        } else {
+          setResources([]);
+        }
+      })
+      .catch((error) => {
+        setResources([]);
+        console.error('Error fetching resources:', error);
+      });
   }, []);
 
   const fetchClients = (selectedProduct: string) => {
@@ -192,10 +208,7 @@ export function AddTicketPage() {
 
   const createTicket = (payload: CreateTicketPayload) => {
     client.support
-      .post('/tickets', {
-        ...payload,
-        productVersionId: selectedProductVersionId,
-      })
+      .post('/tickets', payload)
       .then(() => {
         navigate('/tickets');
       })
@@ -205,7 +218,7 @@ export function AddTicketPage() {
   };
 
   const onSubmit = (data: FieldValues) => {
-    const { taskIds, ...rest } = data as CreateTicketPayload;
+    const { taskIds, resourceId, ...rest } = data as CreateTicketPayload;
 
     // Ensure taskIds are treated as strings and then converted to numbers
     const numericTaskIds = taskIds?.map(Number);
@@ -217,6 +230,21 @@ export function AddTicketPage() {
         taskIds: numericTaskIds,
         productVersionId: selectedProductVersionId,
       };
+
+      if (resourceId) {
+        const selectedResource = resources.find(
+          (resource) => resource.legajo === Number(resourceId),
+        );
+
+        if (selectedResource) {
+          payload.resource = {
+            legajo: selectedResource.legajo!,
+            nombre: selectedResource.Nombre || '',
+            apellido: selectedResource.Apellido || '',
+          };
+        }
+      }
+
       createTicket(payload);
     } else {
       console.error('Product version ID is required');
@@ -230,6 +258,11 @@ export function AddTicketPage() {
   const taskOptions = tasks.map((task) => ({
     label: task.title,
     value: task.id.toString(),
+  }));
+
+  const resourceOptions = resources.map((resource) => ({
+    label: `${resource.Nombre} ${resource.Apellido}`,
+    value: resource.legajo!.toString(),
   }));
 
   return (
@@ -306,6 +339,12 @@ export function AddTicketPage() {
               )}
             />
           </div>
+          <FormSelect
+            id="resourceId"
+            label="Recurso"
+            options={resourceOptions.map((resource) => resource.label)}
+            control={control}
+          />
           <FormSelect
             id="severity"
             label="Severidad"
