@@ -8,7 +8,6 @@ export const TABLE_COLUMNS = [
   'Estimación',
   'Proyecto',
   'Recurso',
-  'Acciones',
 ];
 
 export const TASK_STATES = ['No Comenzado', 'En Progreso', 'Finalizado'];

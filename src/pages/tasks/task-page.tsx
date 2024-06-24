@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { client } from '@/api/common/client';
-import type { Project, Task } from '@/api/types';
+import type { Project, Resource, Task } from '@/api/types';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -21,12 +21,14 @@ function useQuery() {
 }
 
 export function TaskPage() {
-  const [tasks, setTasks] = useState<Task[] | null>();
+  const [tasks, setTasks] = useState<Task[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [resources, setResources] = useState<Resource[]>([]);
   const navigate = useNavigate();
   const query = useQuery();
   const projectId = query.get('projectId');
+  const resourceId = query.get('resourceId');
 
   useEffect(() => {
     client.projects
@@ -36,6 +38,25 @@ export function TaskPage() {
       })
       .catch((error) => {
         console.error('Error fetching projects:', error);
+      });
+
+    client.psa
+      .get<Resource[]>('/af2aa06e-6191-4590-af70-bfa08ef85b93')
+      .then((response) => {
+        if (Array.isArray(response?.data)) {
+          const normalizedResources = response.data.map((resource) => ({
+            id: resource.legajo,
+            name: resource.Nombre,
+            lastName: resource.Apellido,
+          }));
+          setResources(normalizedResources);
+        } else {
+          setResources([]);
+        }
+      })
+      .catch((error) => {
+        setResources([]);
+        console.error('Error fetching resources:', error);
       });
   }, []);
 
@@ -66,11 +87,21 @@ export function TaskPage() {
     };
 
     fetchTasks();
-  }, [projectId]);
+  }, [projectId, resourceId]);
 
   const handleProjectChange = (value: string) => {
     navigate(`?projectId=${value}`);
   };
+
+  const handleResourceChange = (value: string) => {
+    navigate(`?resourceId=${value}`);
+  };
+
+  const filteredTasks = tasks?.filter((task) =>
+    resourceId && resourceId !== 'all'
+      ? String(task.resource?.id) === resourceId
+      : true,
+  );
 
   return (
     <div className="flex flex-1">
@@ -85,10 +116,26 @@ export function TaskPage() {
               <SelectContent>
                 <SelectGroup>
                   <SelectLabel>Proyecto</SelectLabel>
-                  <SelectItem value="all">Seleccione un proyecto</SelectItem>
+                  <SelectItem value="all">Todos los proyectos</SelectItem>
                   {projects.map((project) => (
                     <SelectItem key={project.id} value={project.id.toString()}>
                       {project.title}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <Select onValueChange={handleResourceChange}>
+              <SelectTrigger className="ml-auto w-[200px]">
+                <SelectValue placeholder="Seleccione un recurso" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Recurso</SelectLabel>
+                  <SelectItem value="all">Todos los recursos</SelectItem>
+                  {resources.map((resource) => (
+                    <SelectItem key={resource.id} value={String(resource.id)}>
+                      {resource.name} {resource.lastName}
                     </SelectItem>
                   ))}
                 </SelectGroup>
@@ -104,10 +151,10 @@ export function TaskPage() {
           </div>
         </div>
         {!isLoading &&
-          (!tasks || tasks.length === 0) &&
+          (!filteredTasks || filteredTasks.length === 0) &&
           'No hay tareas disponibles'}
-        {((tasks && tasks.length > 0) || isLoading) && (
-          <TaskTable tasks={tasks} isLoading={isLoading} />
+        {((filteredTasks && filteredTasks.length > 0) || isLoading) && (
+          <TaskTable tasks={filteredTasks} isLoading={isLoading} />
         )}
       </div>
     </div>

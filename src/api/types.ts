@@ -24,6 +24,7 @@ export interface Task {
     description: string;
   };
   resource?: Resource;
+  ticket?: Ticket;
 }
 
 export interface Resource {

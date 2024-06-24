@@ -30,6 +30,8 @@ export function TaskTable({
             {TABLE_COLUMNS.map((column) => (
               <TableHead key={column}>{column}</TableHead>
             ))}
+            <TableHead>Ticket</TableHead>
+            <TableHead>Acciones</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -43,27 +45,39 @@ export function TaskTable({
                         <div className="h-6 w-full animate-pulse rounded bg-gray-300 !text-center dark:bg-gray-700"></div>
                       </TableCell>
                     ))}
+                    <TableCell>
+                      <div className="h-6 w-full animate-pulse rounded bg-gray-300 dark:bg-gray-700"></div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="h-6 w-full animate-pulse rounded bg-gray-300 dark:bg-gray-700"></div>
+                    </TableCell>
                   </TableRow>
                 ))
             : sortedTasks?.map((task: Task) => (
                 <TableRow key={task.id}>
-                  <TableCell className="text-center">{task?.id}</TableCell>
-                  <TableCell className="text-center">{task.title}</TableCell>
+                  <TableCell className="text-center">
+                    {task?.id || '-'}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {task.title || '-'}
+                  </TableCell>
                   <TableCell className="max-w-[200px] truncate text-center">
-                    {task.description}
+                    {task.description || '-'}
                   </TableCell>
                   <TableCell className="text-center">
-                    {formatDate(task.startDate)}
+                    {task.startDate ? formatDate(task.startDate) : '-'}
                   </TableCell>
                   <TableCell className="text-center">
-                    {formatDate(task.endDate)}
-                  </TableCell>
-                  <TableCell className="text-center">{task.status}</TableCell>
-                  <TableCell className="text-center">
-                    {task.estimation}
+                    {task.endDate ? formatDate(task.endDate) : '-'}
                   </TableCell>
                   <TableCell className="text-center">
-                    {task.project.title}
+                    {task.status || '-'}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {task.estimation || '-'}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {task.project.title || '-'}
                   </TableCell>
                   <TableCell className="text-center">
                     {task.resource?.name && task.resource?.lastName
@@ -71,12 +85,23 @@ export function TaskTable({
                       : '-'}
                   </TableCell>
                   <TableCell className="text-center">
-                    <Link
-                      to={`/tasks/edit/${task.project.id}/${task.id}`}
-                      className="underline"
-                    >
-                      Editar tarea
-                    </Link>
+                    {task.ticket?.title || '-'}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <div className="flex flex-col gap-2">
+                      <Link
+                        to={`/tasks/edit/${task.project.id}/${task.id}`}
+                        className="underline"
+                      >
+                        Editar tarea
+                      </Link>
+                      <Link
+                        to={`/tasks?ticketId=${task.id}`}
+                        className="underline"
+                      >
+                        Ver tareas asociadas
+                      </Link>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
