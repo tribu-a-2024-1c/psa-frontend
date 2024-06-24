@@ -95,12 +95,6 @@ export function TaskTable({
                       >
                         Editar tarea
                       </Link>
-                      <Link
-                        to={`/tasks?ticketId=${task.id}`}
-                        className="underline"
-                      >
-                        Ver tareas asociadas
-                      </Link>
                     </div>
                   </TableCell>
                 </TableRow>

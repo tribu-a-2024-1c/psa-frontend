@@ -148,6 +148,9 @@ export function AddTicketPage() {
   const [selectedProductVersionId, setSelectedProductVersionId] = useState<
     number | null
   >(null);
+  const [selectedResource, setSelectedResource] = useState<Resource | null>(
+    null,
+  );
   const [_, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const { ticketId } = useParams<{ ticketId?: string }>();
@@ -202,6 +205,7 @@ export function AddTicketPage() {
         .get<Ticket>(`/tickets/${ticketId}`)
         .then((response) => {
           const ticket = response.data;
+          console.log('Fetched ticket:', ticket);
           setValue('title', ticket.title);
           setValue('description', ticket.description);
           setValue(
@@ -223,7 +227,9 @@ export function AddTicketPage() {
           }
 
           if (ticket.resource) {
-            setValue('resourceId', ticket.resource.id.toString());
+            console.log('Selected resource:', ticket.resource);
+            setValue('resourceId', ticket.resource.legajo?.toString());
+            setSelectedResource(ticket.resource);
           }
 
           if (ticket.tasks && ticket.tasks.length > 0) {
@@ -240,6 +246,7 @@ export function AddTicketPage() {
   }, [ticketId, setValue]);
 
   const fetchClients = (selectedProduct: string) => {
+    console.log('Fetching clients for product:', selectedProduct);
     const [name, version] = selectedProduct.split(' - ');
     const product = products.find(
       (p) => p.name === name && p.version === version,
@@ -247,6 +254,7 @@ export function AddTicketPage() {
     if (product && product.clients) {
       setSelectedProductClients(product.clients);
       setSelectedProductVersionId(product.id);
+      console.log('Selected product clients:', product.clients);
     } else {
       setSelectedProductClients([]);
       setSelectedProductVersionId(null);
@@ -254,28 +262,62 @@ export function AddTicketPage() {
   };
 
   const createTicket = (payload: CreateTicketPayload) => {
+    console.log('Creating ticket with payload:', payload);
     client.support
       .post('/tickets', payload)
-      .then(() => {
+      .then((response) => {
+        const newTicket = response.data;
+        console.log('Ticket created:', newTicket);
+
+        if (selectedResource) {
+          console.log('Assigning resource to ticket:', selectedResource);
+          return client.support.post(`/tickets/${newTicket.id}/resource`, {
+            legajo: selectedResource.legajo,
+            nombre: selectedResource.Nombre,
+            apellido: selectedResource.Apellido,
+          });
+        }
+      })
+      .then((response) => {
+        if (response) {
+          console.log('Resource assigned:', response.data);
+        }
         navigate('/tickets');
       })
       .catch((error) => {
-        console.error('Error creating ticket:', error);
+        console.error('Error creating or assigning resource to ticket:', error);
       });
   };
 
   const editTicket = (payload: CreateTicketPayload) => {
+    console.log('Editing ticket with payload:', payload);
     client.support
       .put(`/tickets/${ticketId}/updateTicket`, payload)
-      .then(() => {
+      .then((response) => {
+        console.log('Ticket edited:', response.data);
+
+        if (selectedResource) {
+          console.log('Assigning resource to ticket:', selectedResource);
+          return client.support.post(`/tickets/${ticketId}/resource`, {
+            legajo: selectedResource.legajo,
+            nombre: selectedResource.Nombre,
+            apellido: selectedResource.Apellido,
+          });
+        }
+      })
+      .then((response) => {
+        if (response) {
+          console.log('Resource assigned:', response.data);
+        }
         navigate('/tickets');
       })
       .catch((error) => {
-        console.error('Error editing ticket:', error);
+        console.error('Error editing or assigning resource to ticket:', error);
       });
   };
 
   const onSubmit = (data: FieldValues) => {
+    console.log('Form submitted with data:', data);
     const { taskIds, resourceId, ...rest } = data as CreateTicketPayload;
 
     const numericTaskIds = taskIds?.map(Number);
@@ -293,11 +335,8 @@ export function AddTicketPage() {
         );
 
         if (selectedResource) {
-          payload.resource = {
-            legajo: selectedResource.legajo!,
-            nombre: selectedResource.Nombre || '',
-            apellido: selectedResource.Apellido || '',
-          };
+          setSelectedResource(selectedResource);
+          console.log('Selected resource:', selectedResource);
         }
       }
 
