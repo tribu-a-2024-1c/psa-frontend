@@ -1,40 +1,58 @@
-import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
-import viteLogo from '/vite.svg';
-import reactLogo from '@/assets/react.svg';
+import { menuItems } from '@/api/config';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
-export function ExamplePage() {
-  const [count, setCount] = useState(0);
+export const ExamplePage = () => {
+  const filteredCards = menuItems.filter((item) => item.description);
 
   return (
-    <>
-      <div className="flex justify-center space-x-4">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="w-20" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="w-20" alt="React logo" />
-        </a>
+    <div className="lg:grid lg:min-h-[800px] lg:grid-cols-2">
+      <div className="relative hidden bg-muted lg:block">
+        <img
+          src="/psa.png"
+          alt="PSA"
+          className="size-full rounded-xl object-cover backdrop-brightness-200 dark:brightness-[0.2] dark:grayscale"
+        />
+        <div className="absolute right-4 top-4 text-lg font-extrabold text-black dark:text-white">
+          PSA
+        </div>
+        <div className="absolute bottom-4 right-4 text-black dark:text-white">
+          <blockquote className="font-extrabold">
+            Gestion de Proyectos y Tickets
+          </blockquote>
+          <div className="font-extrabold">PSA Team</div>
+        </div>
       </div>
-      <h1 className="mt-4 text-center text-3xl font-bold text-gray-900 dark:text-gray-100">
-        Vite + React
-      </h1>
-      <div className="card mt-4 rounded-lg bg-white p-4 text-center shadow-md dark:bg-gray-800 dark:text-gray-100">
-        <button
-          className="rounded-xl border-2 border-blue-300 px-4 py-2 font-bold transition-colors hover:border-blue-700 dark:border-blue-500 dark:hover:border-blue-300"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          count is {count}
-        </button>
-        <p className="mt-4">
-          Edit{' '}
-          <code className="text-gray-900 dark:text-gray-100">src/App.tsx</code>{' '}
-          and save to test HMR
-        </p>
+      <div className="flex-1 px-6 py-8">
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-2">
+          {filteredCards.map((card) => (
+            <Card key={card.title}>
+              <CardHeader>
+                <CardTitle>{card.title}</CardTitle>
+                <CardDescription>{card.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Link
+                  className="inline-flex items-center gap-2 text-sm font-medium text-black hover:underline dark:text-white"
+                  to={card.link}
+                >
+                  {card.icon}
+                  Administra {card.title}
+                </Link>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
-      <p className="read-the-docs mt-4 text-center text-gray-900 dark:text-gray-100">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </div>
   );
-}
+};
+
+export default ExamplePage;
