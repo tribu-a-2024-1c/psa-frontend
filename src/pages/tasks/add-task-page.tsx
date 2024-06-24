@@ -43,6 +43,8 @@ function FormSelectResource({
   options = [],
   control,
 }: FormSelectResourceProps) {
+  const safeOptions = Array.isArray(options) ? options : [];
+
   return (
     <div className="grid gap-2">
       <Label htmlFor={id}>{label}</Label>
@@ -52,7 +54,13 @@ function FormSelectResource({
         render={({ field }) => (
           <Select
             {...field}
-            onValueChange={(value) => field.onChange(JSON.parse(value))}
+            onValueChange={(value) => {
+              try {
+                field.onChange(JSON.parse(value));
+              } catch (error) {
+                console.error('Invalid JSON:', value, error);
+              }
+            }}
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder={`Seleccionar ${label.toLowerCase()}`}>
@@ -64,7 +72,7 @@ function FormSelectResource({
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>{label}</SelectLabel>
-                {options?.map((option) => (
+                {safeOptions.map((option) => (
                   <SelectItem
                     key={option.legajo}
                     value={JSON.stringify(option)}
@@ -115,6 +123,8 @@ function FormSelect({ id, label, options = [], control }: FormSelectProps) {
   ): option is { value: string; label: string } =>
     typeof option === 'object' && 'value' in option && 'label' in option;
 
+  const safeOptions = Array.isArray(options) ? options : [];
+
   return (
     <div className="grid gap-2">
       <Label htmlFor={id}>{label}</Label>
@@ -130,7 +140,7 @@ function FormSelect({ id, label, options = [], control }: FormSelectProps) {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>{label}</SelectLabel>
-                {options?.map((option) =>
+                {safeOptions?.map((option) =>
                   isComplexOptions(option) ? (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
@@ -215,7 +225,7 @@ export function AddTaskPage() {
         navigate('/tasks');
       })
       .catch((error) => {
-        console.error('Error fetching projects:', error);
+        console.error('Error creating task:', error);
       });
   };
 
@@ -239,7 +249,7 @@ export function AddTaskPage() {
         navigate('/tasks');
       })
       .catch((error) => {
-        console.error('Error fetching projects:', error);
+        console.error('Error editing task:', error);
       });
   };
 
@@ -287,7 +297,11 @@ export function AddTaskPage() {
       client.projects
         .get('/projects')
         .then((response) => {
-          setProjects(response.data);
+          if (Array.isArray(response.data)) {
+            setProjects(response.data);
+          } else {
+            setProjects([]);
+          }
         })
         .catch((error) => {
           setProjects([]);
@@ -299,7 +313,11 @@ export function AddTaskPage() {
       client.psa
         .get('/af2aa06e-6191-4590-af70-bfa08ef85b93')
         .then((response) => {
-          setResources(response?.data);
+          if (Array.isArray(response?.data)) {
+            setResources(response?.data);
+          } else {
+            setResources([]);
+          }
         })
         .catch((error) => {
           setResources([]);
