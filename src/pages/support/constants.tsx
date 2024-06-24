@@ -5,10 +5,6 @@ export const TABLE_COLUMNS = [
   'Fecha de Inicio',
   'Fecha de Finalización',
   'Estado',
-  'Tipo',
-  'Producto',
-  'Cliente',
-  'Prioridad',
   'Acciones',
 ];
 

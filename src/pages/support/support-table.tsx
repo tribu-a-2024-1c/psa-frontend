@@ -20,6 +20,14 @@ export function SupportTable({
   tickets: Ticket[] | null | undefined;
   isLoading: boolean;
 }) {
+  const sortedTickets = tickets
+    ? [...tickets].sort((a, b) => {
+        const idA = typeof a.id === 'number' ? a.id : parseInt(a.id, 10);
+        const idB = typeof b.id === 'number' ? b.id : parseInt(b.id, 10);
+        return idB - idA;
+      })
+    : [];
+
   return (
     <div className="rounded-lg border bg-gray-100 shadow-sm dark:bg-gray-950">
       <Table>
@@ -43,16 +51,25 @@ export function SupportTable({
                     ))}
                   </TableRow>
                 ))
-            : tickets?.map((support: Ticket) => (
-                <TableRow key={support.id}>
-                  <TableCell>{support?.id}</TableCell>
-                  <TableCell>{support.title}</TableCell>
-                  <TableCell>{support.description}</TableCell>
-                  <TableCell>{formatDate(support.startDate)}</TableCell>
-                  <TableCell>{formatDate(support.endDate)}</TableCell>
-                  <TableCell>{support.status}</TableCell>
-                  <TableCell>
-                    <Link to="/tasks" className="underline">
+            : sortedTickets?.map((ticket: Ticket) => (
+                <TableRow key={ticket.id}>
+                  <TableCell className="text-center">{ticket?.id}</TableCell>
+                  <TableCell className="text-center">{ticket.title}</TableCell>
+                  <TableCell className="max-w-[200px] truncate text-center">
+                    {ticket.description}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {formatDate(ticket.startDate)}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {formatDate(ticket.endDate)}
+                  </TableCell>
+                  <TableCell className="text-center">{ticket.status}</TableCell>
+                  <TableCell className="text-center">
+                    <Link
+                      to={`/tasks?ticketId=${ticket.id}`}
+                      className="underline"
+                    >
                       Ver tareas asociadas
                     </Link>
                   </TableCell>

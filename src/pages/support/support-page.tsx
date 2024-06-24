@@ -8,26 +8,22 @@ import { Button } from '@/components/ui/button';
 import { SupportTable } from './support-table';
 
 export function SupportPage() {
-  const [tickets, setProjects] = useState<Ticket[] | null>();
+  const [tickets, setTickets] = useState<Ticket[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchProjects = () => {
-      client.support
-        .get('/tickets')
-        .then((response) => {
-          setProjects(response.data);
-        })
-        .catch((error) => {
-          setProjects([]);
-          console.error('Error fetching tickets:', error);
-        })
-        .finally(() => setIsLoading(false));
-    };
-
-    fetchProjects();
+    client.support
+      .get('/tickets')
+      .then((response) => {
+        setTickets(response.data);
+      })
+      .catch((error) => {
+        setTickets([]);
+        console.error('Error fetching tickets:', error);
+      })
+      .finally(() => setIsLoading(false));
   }, []);
 
   return (
@@ -36,14 +32,14 @@ export function SupportPage() {
         <div className="mb-4 flex items-center">
           <h1 className="text-2xl font-bold">Tickets</h1>
           <Button
-            className="ml-auto"
+            className="ml-auto h-[40px]"
             size="sm"
             onClick={() => navigate('/tickets/new')}
           >
             Crear Ticket
           </Button>
         </div>
-        {!isLoading && !tickets?.length && 'No hay proyectos disponibles'}
+        {!isLoading && !tickets?.length && 'No hay tickets disponibles'}
         {(isLoading || (tickets && tickets?.length > 0)) && (
           <SupportTable tickets={tickets} isLoading={isLoading} />
         )}

@@ -60,3 +60,16 @@ export enum Priority {
   S3 = '30 dias',
   S4 = '60 dias',
 }
+
+export interface Client {
+  id: number;
+  razonSocial: string;
+  cuit: string;
+}
+
+export interface ProductWithVersion {
+  id: number;
+  name: string;
+  version: string;
+  clients: Client[];
+}
