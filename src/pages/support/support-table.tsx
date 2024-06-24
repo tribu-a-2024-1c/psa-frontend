@@ -87,7 +87,7 @@ export function SupportTable({
                         to={`/tickets/edit/${ticket.id}`}
                         className="underline"
                       >
-                        Editar tarea
+                        Editar Ticket
                       </Link>
                     </div>
                   </TableCell>

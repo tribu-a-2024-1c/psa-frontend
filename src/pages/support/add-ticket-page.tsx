@@ -1,7 +1,8 @@
+import moment from 'moment';
 import { useEffect, useState } from 'react';
 import type { Control, FieldValues } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { client } from '@/api/common/client';
 import {
@@ -11,6 +12,7 @@ import {
   type ProductWithVersion,
   type Resource,
   type Task,
+  type Ticket,
 } from '@/api/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -148,10 +150,12 @@ export function AddTicketPage() {
   >(null);
   const [_, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const { ticketId } = useParams<{ ticketId?: string }>();
 
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { isValid },
   } = useForm({ mode: 'onChange' });
 
@@ -192,12 +196,55 @@ export function AddTicketPage() {
       });
   }, []);
 
+  useEffect(() => {
+    if (ticketId) {
+      client.support
+        .get<Ticket>(`/tickets/${ticketId}`)
+        .then((response) => {
+          const ticket = response.data;
+          setValue('title', ticket.title);
+          setValue('description', ticket.description);
+          setValue(
+            'startDate',
+            moment.utc(ticket.startDate).format('YYYY-MM-DD'),
+          );
+          setValue('endDate', moment.utc(ticket.endDate).format('YYYY-MM-DD'));
+          setValue('status', ticket.status);
+          setValue('type', ticket.type);
+          setValue('severity', ticket.severity);
+          setValue('priority', ticket.priority);
+          setValue(
+            'productVersion',
+            `${ticket.productVersion.product.name} - ${ticket.productVersion.version}`,
+          );
+          setSelectedProductVersionId(ticket.productVersion.id);
+          if (ticket.productVersion.product.clients) {
+            setSelectedProductClients(ticket.productVersion.product.clients);
+          }
+
+          if (ticket.resource) {
+            setValue('resourceId', ticket.resource.id.toString());
+          }
+
+          if (ticket.tasks && ticket.tasks.length > 0) {
+            setValue(
+              'taskIds',
+              ticket.tasks.map((task) => task.id.toString()),
+            );
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching ticket:', error);
+        });
+    }
+  }, [ticketId, setValue]);
+
   const fetchClients = (selectedProduct: string) => {
     const [name, version] = selectedProduct.split(' - ');
     const product = products.find(
       (p) => p.name === name && p.version === version,
     );
-    if (product) {
+    if (product && product.clients) {
       setSelectedProductClients(product.clients);
       setSelectedProductVersionId(product.id);
     } else {
@@ -217,13 +264,22 @@ export function AddTicketPage() {
       });
   };
 
+  const editTicket = (payload: CreateTicketPayload) => {
+    client.support
+      .put(`/tickets/${ticketId}/updateTicket`, payload)
+      .then(() => {
+        navigate('/tickets');
+      })
+      .catch((error) => {
+        console.error('Error editing ticket:', error);
+      });
+  };
+
   const onSubmit = (data: FieldValues) => {
     const { taskIds, resourceId, ...rest } = data as CreateTicketPayload;
 
-    // Ensure taskIds are treated as strings and then converted to numbers
     const numericTaskIds = taskIds?.map(Number);
 
-    // Ensure productVersionId is not null before creating the payload
     if (selectedProductVersionId !== null) {
       const payload: CreateTicketPayload = {
         ...rest,
@@ -245,7 +301,11 @@ export function AddTicketPage() {
         }
       }
 
-      createTicket(payload);
+      if (ticketId) {
+        editTicket(payload);
+      } else {
+        createTicket(payload);
+      }
     } else {
       console.error('Product version ID is required');
     }
@@ -268,7 +328,9 @@ export function AddTicketPage() {
   return (
     <div className="flex flex-1">
       <div className="flex-1 bg-gray-100 p-4 dark:bg-gray-950 md:p-6">
-        <h1 className="mb-4 text-2xl font-bold">Crear Ticket Nuevo</h1>
+        <h1 className="mb-4 text-2xl font-bold">
+          {ticketId ? 'Editar Ticket' : 'Crear Ticket Nuevo'}
+        </h1>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
           <FormItem
             id="title"
@@ -374,7 +436,7 @@ export function AddTicketPage() {
               Cancelar
             </Button>
             <Button type="submit" disabled={!isValid}>
-              Agregar
+              {ticketId ? 'Editar' : 'Agregar'}
             </Button>
           </div>
         </form>

@@ -1,3 +1,25 @@
+export interface Client {
+  id: number;
+  razonSocial: string;
+  cuit: string;
+}
+
+export interface ProductWithVersion {
+  id: number;
+  name: string;
+  version: string;
+  clients: Client[];
+}
+
+export interface Resource {
+  legajo?: number;
+  Nombre?: string;
+  Apellido?: string;
+  id?: number;
+  lastName?: string;
+  name?: string;
+}
+
 export interface Project {
   id: number | string;
   title: string;
@@ -27,15 +49,6 @@ export interface Task {
   ticket?: Ticket;
 }
 
-export interface Resource {
-  legajo?: number;
-  Nombre?: string;
-  Apellido?: string;
-  id?: number;
-  lastName?: string;
-  name?: string;
-}
-
 export interface Ticket {
   id: number;
   title: string;
@@ -51,6 +64,7 @@ export interface Ticket {
     product: {
       id: number;
       name: string;
+      clients: Client[];
     };
   };
   resource?: {
@@ -59,6 +73,7 @@ export interface Ticket {
     lastName: string;
   } | null;
   priority?: Priority;
+  tasks?: Task[];
 }
 
 export enum TicketType {
@@ -71,19 +86,6 @@ export enum Priority {
   S2 = '15 dias',
   S3 = '30 dias',
   S4 = '60 dias',
-}
-
-export interface Client {
-  id: number;
-  razonSocial: string;
-  cuit: string;
-}
-
-export interface ProductWithVersion {
-  id: number;
-  name: string;
-  version: string;
-  clients: Client[];
 }
 
 export interface CreateTicketPayload {

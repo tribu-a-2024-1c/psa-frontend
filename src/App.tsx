@@ -29,6 +29,7 @@ function App() {
             <Route path="/tickets" element={<SupportPage />} />
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/tickets/new" element={<AddTicketPage />} />
+            <Route path="/tickets/edit/:ticketId" element={<AddTicketPage />} />
             <Route
               path="/tasks/edit/:projectId/:taskId"
               element={<AddTaskPage />}
