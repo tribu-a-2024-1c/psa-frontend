@@ -60,7 +60,7 @@ export function SupportTable({
                     {formatDate(ticket.startDate)}
                   </TableCell>
                   <TableCell className="text-center">
-                    {formatDate(ticket.endDate)}
+                    {ticket.endDate ? formatDate(ticket.endDate) : '-'}
                   </TableCell>
                   <TableCell className="text-center">{ticket.status}</TableCell>
                   <TableCell className="text-center">
@@ -98,3 +98,5 @@ export function SupportTable({
     </div>
   );
 }
+
+export default SupportTable;
