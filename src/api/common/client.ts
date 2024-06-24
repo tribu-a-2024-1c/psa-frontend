@@ -9,7 +9,7 @@ const supportService = axios.create({
 });
 
 const psaService = axios.create({
-  baseURL: `${import.meta.env.VITE_API_PSA_URL}`,
+  baseURL: 'https://run.mocky.io/v3',
 });
 
 projectsService.defaults.headers.common['projects-Type'] = 'application/json';
