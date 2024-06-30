@@ -46,6 +46,7 @@ function FormTextarea({ id, label, placeholder, control }: FormTextareaProps) {
         name={id}
         control={control}
         rules={{ required: true }}
+        defaultValue=""
         render={({ field }) => (
           <Textarea
             {...field}
@@ -81,6 +82,7 @@ function FormSelect({
         name={id}
         control={control}
         rules={{ required: true }}
+        defaultValue=""
         render={({ field }) => (
           <Select
             {...field}
@@ -131,6 +133,7 @@ function FormItem({
         name={id}
         control={control}
         rules={{ required: true }}
+        defaultValue=""
         render={({ field }) => (
           <Input {...field} id={id} type={type} placeholder={placeholder} />
         )}
@@ -152,7 +155,6 @@ export function EditTicketPage() {
   const [selectedResource, setSelectedResource] = useState<Resource | null>(
     null,
   );
-  const [_, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const { ticketId } = useParams<{ ticketId?: string }>();
 
@@ -161,7 +163,22 @@ export function EditTicketPage() {
     handleSubmit,
     setValue,
     formState: { isValid },
-  } = useForm({ mode: 'onChange' });
+  } = useForm({
+    mode: 'onChange',
+    defaultValues: {
+      title: '',
+      description: '',
+      startDate: '',
+      endDate: '',
+      status: '',
+      type: '',
+      severity: '',
+      priority: '',
+      productVersion: '',
+      resourceId: '',
+      taskIds: [] as number[], // Set default value type to number[]
+    },
+  });
 
   useEffect(() => {
     client.support
@@ -172,8 +189,7 @@ export function EditTicketPage() {
       .catch((error) => {
         setProducts([]);
         console.error('Error fetching products:', error);
-      })
-      .finally(() => setIsLoading(false));
+      });
 
     client.projects
       .get<Task[]>('/projects/tasks')
@@ -217,8 +233,9 @@ export function EditTicketPage() {
           setValue('status', ticket.status);
           setValue('type', ticket.type);
           setValue('severity', ticket.severity);
-          setValue('priority', ticket.priority);
+          setValue('priority', ticket.priority || '');
           const productVersionLabel = `${ticket.productVersion.product.name} - ${ticket.productVersion.version}`;
+          console.log('Setting productVersion:', productVersionLabel);
           setValue('productVersion', productVersionLabel);
           setSelectedProductVersionId(ticket.productVersion.id);
           if (ticket.productVersion.product.clients) {
@@ -237,7 +254,7 @@ export function EditTicketPage() {
           if (ticket.tasks && ticket.tasks.length > 0) {
             setValue(
               'taskIds',
-              ticket.tasks.map((task) => task.id.toString()),
+              ticket.tasks.map((task) => task.id),
             );
           }
         })
@@ -426,6 +443,7 @@ export function EditTicketPage() {
             <Controller
               name="taskIds"
               control={control}
+              defaultValue={[]}
               render={({ field }) => (
                 <MultiSelect
                   {...field}
