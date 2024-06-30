@@ -136,14 +136,15 @@ function FormSelectResource({
                 setValue('leader', resource);
               } catch (error) {
                 console.error('Invalid JSON:', value, error);
+                field.onChange(null);
               }
             }}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder={`Seleccionar ${label.toLowerCase()}`}>
                 {field.value
-                  ? `${(field.value as Resource).name} ${
-                      (field.value as Resource).lastName
+                  ? `${(field.value as Resource).Nombre} ${
+                      (field.value as Resource).Apellido
                     }`
                   : `Seleccionar ${label.toLowerCase()}`}
               </SelectValue>
@@ -228,9 +229,12 @@ export function UpdateProjectPage() {
     const fetchData = async () => {
       try {
         const resourceResponse = await client.psa.get<Resource[]>('/');
-        setResources(
-          Array.isArray(resourceResponse?.data) ? resourceResponse.data : [],
-        );
+        const mappedResources = resourceResponse.data.map((resource) => ({
+          ...resource,
+          name: resource.Nombre,
+          lastName: resource.Apellido,
+        }));
+        setResources(mappedResources);
 
         if (projectId) {
           const projectResponse = await client.projects.get<Project>(
@@ -246,7 +250,11 @@ export function UpdateProjectPage() {
           );
           setValue('endDate', moment.utc(project.endDate).format('YYYY-MM-DD'));
           setValue('status', project.status);
-          setValue('leader', project.leader);
+          setValue('leader', {
+            ...project.leader,
+            Nombre: project.leader.name,
+            Apellido: project.leader.lastName,
+          });
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -279,8 +287,8 @@ export function UpdateProjectPage() {
       ...data,
       leader: {
         legajo: leader.legajo!,
-        nombre: leader.name!,
-        apellido: leader.lastName!,
+        nombre: leader.Nombre!,
+        apellido: leader.Apellido!,
       },
     };
     setIsSubmitting(true);
@@ -396,5 +404,3 @@ function Skeleton() {
     </div>
   );
 }
-
-export default Skeleton;
