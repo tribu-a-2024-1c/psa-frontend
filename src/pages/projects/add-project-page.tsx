@@ -101,7 +101,6 @@ function FormSelectResource({
   options = [],
   control,
   setValue,
-  getValues,
 }: FormSelectResourceProps) {
   const safeOptions = Array.isArray(options) ? options : [];
 
@@ -126,8 +125,8 @@ function FormSelectResource({
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder={`Seleccionar ${label.toLowerCase()}`}>
-                {getValues()?.Nombre
-                  ? `${getValues()?.Nombre} ${getValues()?.Apellido}`
+                {field.value
+                  ? `${field.value.Nombre} ${field.value.Apellido}`
                   : `Seleccionar ${label.toLowerCase()}`}
               </SelectValue>
             </SelectTrigger>
@@ -282,7 +281,7 @@ export function AddProjectPage() {
             options={resources}
             control={control}
             setValue={setValue}
-            getValues={getValues}
+            getValues={() => getValues('leader') as Resource}
           />
           <div className="mt-4 flex justify-end gap-2">
             <Button variant="secondary" onClick={() => navigate('/projects')}>
