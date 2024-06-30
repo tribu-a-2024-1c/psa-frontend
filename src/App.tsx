@@ -12,6 +12,7 @@ import {
   TaskPage,
 } from './pages';
 import { ProductsPage } from './pages/products/products-page';
+import { UpdateProjectPage } from './pages/projects/update-project-page';
 import { AddTicketPage } from './pages/support/add-ticket-page';
 import { EditTicketPage } from './pages/support/edit-ticket-page';
 import { SupportPage } from './pages/support/support-page';
@@ -25,6 +26,10 @@ function App() {
             <Route path="/" element={<DashboardPage />} />
             <Route path="/projects" element={<ProjectPage />} />
             <Route path="/projects/new" element={<AddProjectPage />} />
+            <Route
+              path="/projects/edit/:projectId"
+              element={<UpdateProjectPage />}
+            />
             <Route path="/tasks" element={<TaskPage />} />
             <Route path="/tasks/new" element={<AddTaskPage />} />
             <Route path="/tickets" element={<SupportPage />} />

@@ -75,12 +75,20 @@ export function ProjectTable({
                       : 'N/A'}
                   </TableCell>
                   <TableCell className="text-center">
-                    <Link
-                      to={`/tasks?projectId=${project.id}`}
-                      className="underline"
-                    >
-                      Ver tareas asociadas
-                    </Link>
+                    <div className="flex flex-col gap-2">
+                      <Link
+                        to={`/tasks?projectId=${project.id}`}
+                        className="underline"
+                      >
+                        Ver tareas asociadas
+                      </Link>
+                      <Link
+                        to={`/projects/edit/${project.id}`}
+                        className="underline"
+                      >
+                        Editar Projecto
+                      </Link>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
