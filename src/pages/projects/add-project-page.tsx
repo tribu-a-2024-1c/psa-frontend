@@ -92,6 +92,7 @@ interface FormSelectResourceProps {
   options: Resource[];
   control: Control<FieldValues>;
   setValue: (name: string, value: unknown) => void;
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   getValues: () => any;
 }
 

@@ -68,6 +68,11 @@ export function ProjectTable({
                     {project.status}
                   </TableCell>
                   <TableCell className="text-center">
+                    {project.leader
+                      ? `${project.leader.name} ${project.leader.lastName}`
+                      : 'N/A'}
+                  </TableCell>
+                  <TableCell className="text-center">
                     <Link
                       to={`/tasks?projectId=${project.id}`}
                       className="underline"
