@@ -31,6 +31,8 @@ export interface Project {
     legajo: number;
     nombre: string;
     apellido: string;
+    name?: string;
+    lastName?: string;
   };
 }
 

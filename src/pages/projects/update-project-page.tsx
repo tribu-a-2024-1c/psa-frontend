@@ -250,11 +250,13 @@ export function UpdateProjectPage() {
           );
           setValue('endDate', moment.utc(project.endDate).format('YYYY-MM-DD'));
           setValue('status', project.status);
-          setValue('leader', {
-            ...project.leader,
-            Nombre: project.leader.name,
-            Apellido: project.leader.lastName,
-          });
+          if (project.leader) {
+            setValue('leader', {
+              ...project.leader,
+              Nombre: project.leader.name,
+              Apellido: project.leader.lastName,
+            });
+          }
         }
       } catch (error) {
         console.error('Error fetching data:', error);
