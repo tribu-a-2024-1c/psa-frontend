@@ -14,22 +14,6 @@ export const ExamplePage = () => {
 
   return (
     <div className="lg:grid lg:min-h-[800px] lg:grid-cols-2">
-      <div className="relative hidden bg-muted lg:block">
-        <img
-          src="/psa.png"
-          alt="PSA"
-          className="size-full rounded-xl object-cover backdrop-brightness-200 dark:brightness-[0.2] dark:grayscale"
-        />
-        <div className="absolute right-4 top-4 text-lg font-extrabold text-black dark:text-white">
-          PSA
-        </div>
-        <div className="absolute bottom-4 right-4 text-black dark:text-white">
-          <blockquote className="font-extrabold">
-            Gestion de Proyectos y Tickets
-          </blockquote>
-          <div className="font-extrabold">PSA Team</div>
-        </div>
-      </div>
       <div className="flex-1 px-6 py-8">
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-2">
           {filteredCards.map((card) => (
@@ -49,6 +33,22 @@ export const ExamplePage = () => {
               </CardContent>
             </Card>
           ))}
+        </div>
+      </div>
+      <div className="relative hidden bg-muted lg:block">
+        <img
+          src="/psa.png"
+          alt="PSA"
+          className="size-full rounded-xl object-cover backdrop-brightness-200 dark:brightness-[0.2] dark:grayscale"
+        />
+        <div className="absolute right-4 top-4 text-lg font-extrabold text-black dark:text-white">
+          PSA
+        </div>
+        <div className="absolute bottom-4 right-4 text-black dark:text-white">
+          <blockquote className="font-extrabold">
+            Gestion de Proyectos y Tickets
+          </blockquote>
+          <div className="font-extrabold">PSA Team</div>
         </div>
       </div>
     </div>

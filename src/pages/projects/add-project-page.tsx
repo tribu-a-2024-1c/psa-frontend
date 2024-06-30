@@ -195,7 +195,7 @@ export function AddProjectPage() {
 
   useEffect(() => {
     client.psa
-      .get<Resource[]>('/af2aa06e-6191-4590-af70-bfa08ef85b93')
+      .get<Resource[]>('/772e9395-6097-4072-925d-f6a0f822320b')
       .then((response) => {
         if (Array.isArray(response?.data)) {
           setResources(response.data);

@@ -21,12 +21,17 @@ export interface Resource {
 }
 
 export interface Project {
-  id: number | string;
+  id?: number | string;
   title: string;
   startDate: string;
   endDate: string;
   status: string;
   description: string;
+  leader?: {
+    legajo: number;
+    nombre: string;
+    apellido: string;
+  };
 }
 
 export interface Task {

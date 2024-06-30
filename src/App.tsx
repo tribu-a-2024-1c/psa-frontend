@@ -13,6 +13,7 @@ import {
 } from './pages';
 import { ProductsPage } from './pages/products/products-page';
 import { AddTicketPage } from './pages/support/add-ticket-page';
+import { EditTicketPage } from './pages/support/edit-ticket-page';
 import { SupportPage } from './pages/support/support-page';
 
 function App() {
@@ -29,7 +30,10 @@ function App() {
             <Route path="/tickets" element={<SupportPage />} />
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/tickets/new" element={<AddTicketPage />} />
-            <Route path="/tickets/edit/:ticketId" element={<AddTicketPage />} />
+            <Route
+              path="/tickets/edit/:ticketId"
+              element={<EditTicketPage />}
+            />
             <Route
               path="/tasks/edit/:projectId/:taskId"
               element={<AddTaskPage />}

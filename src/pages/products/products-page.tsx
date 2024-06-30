@@ -46,7 +46,7 @@ export function ProductsPage() {
       .finally(() => setIsLoading(false));
 
     client.client
-      .get<PageClient[]>('/0b28eff3-f2e1-468e-bd17-a7e21a2d2b86')
+      .get<PageClient[]>('/e45eb30e-1776-4f47-8613-398bfab3800c')
       .then((response) => {
         const fetchedClients = response.data;
         setClients(fetchedClients);

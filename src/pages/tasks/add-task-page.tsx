@@ -356,7 +356,7 @@ export function AddTaskPage() {
 
     const fetchResources = () => {
       client.psa
-        .get('/af2aa06e-6191-4590-af70-bfa08ef85b93')
+        .get('/772e9395-6097-4072-925d-f6a0f822320b')
         .then((response) => {
           if (Array.isArray(response?.data)) {
             setResources(response?.data);

@@ -1,7 +1,8 @@
+import moment from 'moment';
 import { useEffect, useState } from 'react';
 import type { Control, FieldValues } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { client } from '@/api/common/client';
 import {
@@ -11,6 +12,8 @@ import {
   type ProductWithVersion,
   type Resource,
   type Task,
+  type Ticket,
+  TicketType,
 } from '@/api/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -59,7 +62,7 @@ function FormTextarea({ id, label, placeholder, control }: FormTextareaProps) {
 interface FormSelectProps {
   id: string;
   label: string;
-  options: string[];
+  options: { label: string; value: string }[];
   control: Control<FieldValues>;
   onChange?: (value: string) => void;
 }
@@ -93,8 +96,8 @@ function FormSelect({
               <SelectGroup>
                 <SelectLabel>{label}</SelectLabel>
                 {options.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -136,7 +139,7 @@ function FormItem({
   );
 }
 
-export function AddTicketPage() {
+export function EditTicketPage() {
   const [products, setProducts] = useState<ProductWithVersion[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
@@ -151,10 +154,12 @@ export function AddTicketPage() {
   );
   const [_, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const { ticketId } = useParams<{ ticketId?: string }>();
 
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { isValid },
   } = useForm({ mode: 'onChange' });
 
@@ -195,6 +200,53 @@ export function AddTicketPage() {
       });
   }, []);
 
+  useEffect(() => {
+    if (ticketId) {
+      client.support
+        .get<Ticket>(`/tickets/${ticketId}`)
+        .then((response) => {
+          const ticket = response.data;
+          console.log('Fetched ticket:', ticket);
+          setValue('title', ticket.title);
+          setValue('description', ticket.description);
+          setValue(
+            'startDate',
+            moment.utc(ticket.startDate).format('YYYY-MM-DD'),
+          );
+          setValue('endDate', moment.utc(ticket.endDate).format('YYYY-MM-DD'));
+          setValue('status', ticket.status);
+          setValue('type', ticket.type);
+          setValue('severity', ticket.severity);
+          setValue('priority', ticket.priority);
+          const productVersionLabel = `${ticket.productVersion.product.name} - ${ticket.productVersion.version}`;
+          setValue('productVersion', productVersionLabel);
+          setSelectedProductVersionId(ticket.productVersion.id);
+          if (ticket.productVersion.product.clients) {
+            setSelectedProductClients(ticket.productVersion.product.clients);
+          }
+
+          if (ticket.resource) {
+            console.log('Selected resource:', ticket.resource);
+            setValue(
+              'resourceId',
+              `${ticket.resource.name} ${ticket.resource.lastName}`,
+            );
+            setSelectedResource(ticket.resource);
+          }
+
+          if (ticket.tasks && ticket.tasks.length > 0) {
+            setValue(
+              'taskIds',
+              ticket.tasks.map((task) => task.id.toString()),
+            );
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching ticket:', error);
+        });
+    }
+  }, [ticketId, setValue]);
+
   const fetchClients = (selectedProduct: string) => {
     console.log('Fetching clients for product:', selectedProduct);
     const [name, version] = selectedProduct.split(' - ');
@@ -211,17 +263,16 @@ export function AddTicketPage() {
     }
   };
 
-  const createTicket = (payload: CreateTicketPayload) => {
-    console.log('Creating ticket with payload:', payload);
+  const editTicket = (payload: CreateTicketPayload) => {
+    console.log('Editing ticket with payload:', payload);
     client.support
-      .post('/tickets', payload)
+      .put(`/tickets/${ticketId}/updateTicket`, payload)
       .then((response) => {
-        const newTicket = response.data;
-        console.log('Ticket created:', newTicket);
+        console.log('Ticket edited:', response.data);
 
         if (selectedResource) {
           console.log('Assigning resource to ticket:', selectedResource);
-          return client.support.post(`/tickets/${newTicket.id}/resource`, {
+          return client.support.post(`/tickets/${ticketId}/resource`, {
             legajo: selectedResource.legajo!,
             nombre: selectedResource.Nombre!,
             apellido: selectedResource.Apellido!,
@@ -235,13 +286,13 @@ export function AddTicketPage() {
         navigate('/tickets');
       })
       .catch((error) => {
-        console.error('Error creating or assigning resource to ticket:', error);
+        console.error('Error editing or assigning resource to ticket:', error);
       });
   };
 
   const onSubmit = (data: FieldValues) => {
     console.log('Form submitted with data:', data);
-    const { taskIds, ...rest } = data as CreateTicketPayload;
+    const { taskIds, resourceId, ...rest } = data as CreateTicketPayload;
 
     const numericTaskIds = taskIds?.map(Number);
 
@@ -259,15 +310,28 @@ export function AddTicketPage() {
           : undefined,
       };
 
-      createTicket(payload);
+      if (resourceId) {
+        const selectedResource = resources.find(
+          (resource) =>
+            `${resource.Nombre} ${resource.Apellido}` === String(resourceId),
+        );
+
+        if (selectedResource) {
+          setSelectedResource(selectedResource);
+          console.log('Selected resource:', selectedResource);
+        }
+      }
+
+      editTicket(payload);
     } else {
       console.error('Product version ID is required');
     }
   };
 
-  const productOptions = products.map(
-    (product) => `${product.name} - ${product.version}`,
-  );
+  const productOptions = products.map((product) => ({
+    label: `${product.name} - ${product.version}`,
+    value: `${product.name} - ${product.version}`,
+  }));
 
   const taskOptions = tasks.map((task) => ({
     label: task.title,
@@ -276,13 +340,35 @@ export function AddTicketPage() {
 
   const resourceOptions = resources.map((resource) => ({
     label: `${resource.Nombre} ${resource.Apellido}`,
-    value: resource.legajo!.toString(),
+    value: `${resource.Nombre} ${resource.Apellido}`,
+  }));
+
+  const severityOptions = [
+    { label: 'Baja', value: 'Baja' },
+    { label: 'Media', value: 'Media' },
+    { label: 'Alta', value: 'Alta' },
+  ];
+
+  const statusOptions = [
+    { label: 'Abierto', value: 'Abierto' },
+    { label: 'En Progreso', value: 'En Progreso' },
+    { label: 'Cerrado', value: 'Cerrado' },
+  ];
+
+  const typeOptions = [
+    { label: 'ERROR', value: TicketType.ERROR },
+    { label: 'CONSULTA', value: TicketType.CONSULTA },
+  ];
+
+  const priorityOptions = Object.values(Priority).map((priority) => ({
+    label: priority,
+    value: priority,
   }));
 
   return (
     <div className="flex flex-1">
       <div className="flex-1 bg-gray-100 p-4 dark:bg-gray-950 md:p-6">
-        <h1 className="mb-4 text-2xl font-bold">Crear Ticket Nuevo</h1>
+        <h1 className="mb-4 text-2xl font-bold">Editar Ticket</h1>
         <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
           <FormItem
             id="title"
@@ -356,7 +442,7 @@ export function AddTicketPage() {
           <FormSelect
             id="resourceId"
             label="Recurso"
-            options={resourceOptions.map((resource) => resource.label)}
+            options={resourceOptions}
             control={control}
             onChange={(value) => {
               const selectedResource = resources.find(
@@ -372,25 +458,25 @@ export function AddTicketPage() {
           <FormSelect
             id="severity"
             label="Severidad"
-            options={['Baja', 'Media', 'Alta']}
+            options={severityOptions}
             control={control}
           />
           <FormSelect
             id="status"
             label="Estado"
-            options={['Abierto', 'En Progreso', 'Cerrado']}
+            options={statusOptions}
             control={control}
           />
           <FormSelect
             id="type"
             label="Tipo"
-            options={['ERROR', 'CONSULTA']}
+            options={typeOptions}
             control={control}
           />
           <FormSelect
             id="priority"
             label="Prioridad"
-            options={Object.values(Priority)}
+            options={priorityOptions}
             control={control}
           />
           <div className="mt-4 flex justify-end gap-2">
@@ -398,7 +484,7 @@ export function AddTicketPage() {
               Cancelar
             </Button>
             <Button type="submit" disabled={!isValid}>
-              Agregar
+              Editar
             </Button>
           </div>
         </form>
