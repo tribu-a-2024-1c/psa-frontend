@@ -55,4 +55,4 @@ export const DashboardPage = () => {
   );
 };
 
-export default ExamplePage;
+export default DashboardPage;

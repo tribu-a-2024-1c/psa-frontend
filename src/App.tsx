@@ -7,9 +7,7 @@ import { ThemeProvider } from './components/theme-provider';
 import {
   AddProjectPage,
   AddTaskPage,
-  ,
   DashboardPage,
-  ,
   ProjectPage,
   TaskPage,
 } from './pages';
