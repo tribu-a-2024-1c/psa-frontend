@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { Control, FieldValues } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -68,48 +68,46 @@ interface FormSelectProps {
   onChange?: (value: string) => void;
 }
 
-function FormSelect({
-  id,
-  label,
-  options,
-  control,
-  onChange,
-}: FormSelectProps) {
-  return (
-    <div className="grid gap-2">
-      <Label htmlFor={id}>{label}</Label>
-      <Controller
-        name={id}
-        control={control}
-        rules={{ required: true }}
-        defaultValue=""
-        render={({ field }) => (
-          <Select
-            {...field}
-            onValueChange={(value) => {
-              field.onChange(value);
-              onChange && onChange(value);
-            }}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder={`Seleccionar ${label.toLowerCase()}`} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>{label}</SelectLabel>
-                {options.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        )}
-      />
-    </div>
-  );
-}
+const FormSelect = React.forwardRef<HTMLSelectElement, FormSelectProps>(
+  ({ id, label, options, control, onChange }, ref) => {
+    return (
+      <div className="grid gap-2">
+        <Label htmlFor={id}>{label}</Label>
+        <Controller
+          name={id}
+          control={control}
+          rules={{ required: true }}
+          defaultValue=""
+          render={({ field }) => (
+            <Select
+              {...field}
+              onValueChange={(value) => {
+                field.onChange(value);
+                onChange && onChange(value);
+              }}
+            >
+              <SelectTrigger className="w-full" ref={ref}>
+                <SelectValue
+                  placeholder={`Seleccionar ${label.toLowerCase()}`}
+                />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>{label}</SelectLabel>
+                  {options.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          )}
+        />
+      </div>
+    );
+  },
+);
 
 interface FormItemProps {
   id: string;
@@ -155,6 +153,7 @@ export function EditTicketPage() {
   const [selectedResource, setSelectedResource] = useState<Resource | null>(
     null,
   );
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { ticketId } = useParams<{ ticketId?: string }>();
 
@@ -163,7 +162,7 @@ export function EditTicketPage() {
     handleSubmit,
     setValue,
     formState: { isValid },
-  } = useForm({
+  } = useForm<FieldValues>({
     mode: 'onChange',
     defaultValues: {
       title: '',
@@ -181,48 +180,29 @@ export function EditTicketPage() {
   });
 
   useEffect(() => {
-    client.support
-      .get<ProductWithVersion[]>('/products')
-      .then((response) => {
-        setProducts(response.data);
-      })
-      .catch((error) => {
-        setProducts([]);
-        console.error('Error fetching products:', error);
-      });
+    const fetchData = async () => {
+      try {
+        const productResponse =
+          await client.support.get<ProductWithVersion[]>('/products');
+        setProducts(productResponse.data);
 
-    client.projects
-      .get<Task[]>('/projects/tasks')
-      .then((response) => {
-        setTasks(response.data);
-      })
-      .catch((error) => {
-        setTasks([]);
-        console.error('Error fetching tasks:', error);
-      });
+        const taskResponse =
+          await client.projects.get<Task[]>('/projects/tasks');
+        setTasks(taskResponse.data);
 
-    client.psa
-      .get<Resource[]>('/772e9395-6097-4072-925d-f6a0f822320b')
-      .then((response) => {
-        if (Array.isArray(response?.data)) {
-          setResources(response.data);
-        } else {
-          setResources([]);
-        }
-      })
-      .catch((error) => {
-        setResources([]);
-        console.error('Error fetching resources:', error);
-      });
-  }, []);
+        const resourceResponse = await client.psa.get<Resource[]>(
+          '/772e9395-6097-4072-925d-f6a0f822320b',
+        );
+        setResources(
+          Array.isArray(resourceResponse?.data) ? resourceResponse.data : [],
+        );
 
-  useEffect(() => {
-    if (ticketId) {
-      client.support
-        .get<Ticket>(`/tickets/${ticketId}`)
-        .then((response) => {
-          const ticket = response.data;
-          console.log('Fetched ticket:', ticket);
+        if (ticketId) {
+          const ticketResponse = await client.support.get<Ticket>(
+            `/tickets/${ticketId}`,
+          );
+          const ticket = ticketResponse.data;
+
           setValue('title', ticket.title);
           setValue('description', ticket.description);
           setValue(
@@ -235,15 +215,14 @@ export function EditTicketPage() {
           setValue('severity', ticket.severity);
           setValue('priority', ticket.priority || '');
           const productVersionLabel = `${ticket.productVersion.product.name} - ${ticket.productVersion.version}`;
-          console.log('Setting productVersion:', productVersionLabel);
           setValue('productVersion', productVersionLabel);
           setSelectedProductVersionId(ticket.productVersion.id);
+
           if (ticket.productVersion.product.clients) {
             setSelectedProductClients(ticket.productVersion.product.clients);
           }
 
           if (ticket.resource) {
-            console.log('Selected resource:', ticket.resource);
             setValue(
               'resourceId',
               `${ticket.resource.name} ${ticket.resource.lastName}`,
@@ -257,15 +236,18 @@ export function EditTicketPage() {
               ticket.tasks.map((task) => task.id),
             );
           }
-        })
-        .catch((error) => {
-          console.error('Error fetching ticket:', error);
-        });
-    }
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, [ticketId, setValue]);
 
   const fetchClients = (selectedProduct: string) => {
-    console.log('Fetching clients for product:', selectedProduct);
     const [name, version] = selectedProduct.split(' - ');
     const product = products.find(
       (p) => p.name === name && p.version === version,
@@ -273,7 +255,6 @@ export function EditTicketPage() {
     if (product && product.clients) {
       setSelectedProductClients(product.clients);
       setSelectedProductVersionId(product.id);
-      console.log('Selected product clients:', product.clients);
     } else {
       setSelectedProductClients([]);
       setSelectedProductVersionId(null);
@@ -281,14 +262,10 @@ export function EditTicketPage() {
   };
 
   const editTicket = (payload: CreateTicketPayload) => {
-    console.log('Editing ticket with payload:', payload);
     client.support
       .put(`/tickets/${ticketId}/updateTicket`, payload)
       .then((response) => {
-        console.log('Ticket edited:', response.data);
-
         if (selectedResource) {
-          console.log('Assigning resource to ticket:', selectedResource);
           return client.support.post(`/tickets/${ticketId}/resource`, {
             legajo: selectedResource.legajo!,
             nombre: selectedResource.Nombre!,
@@ -308,7 +285,6 @@ export function EditTicketPage() {
   };
 
   const onSubmit = (data: FieldValues) => {
-    console.log('Form submitted with data:', data);
     const { taskIds, resourceId, ...rest } = data as CreateTicketPayload;
 
     const numericTaskIds = taskIds?.map(Number);
@@ -335,7 +311,6 @@ export function EditTicketPage() {
 
         if (selectedResource) {
           setSelectedResource(selectedResource);
-          console.log('Selected resource:', selectedResource);
         }
       }
 
@@ -352,7 +327,7 @@ export function EditTicketPage() {
 
   const taskOptions = tasks.map((task) => ({
     label: task.title,
-    value: task.id.toString(),
+    value: task.id.toString(), // Convert task id to string
   }));
 
   const resourceOptions = resources.map((resource) => ({
@@ -386,127 +361,182 @@ export function EditTicketPage() {
     <div className="flex flex-1">
       <div className="flex-1 bg-gray-100 p-4 dark:bg-gray-950 md:p-6">
         <h1 className="mb-4 text-2xl font-bold">Editar Ticket</h1>
-        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
-          <FormItem
-            id="title"
-            label="Título"
-            placeholder="Ingrese título del ticket"
-            control={control}
-          />
-          <FormTextarea
-            id="description"
-            label="Descripción"
-            placeholder="Ingrese descripción del ticket"
-            control={control}
-          />
-          <FormItem
-            id="startDate"
-            label="Fecha de Inicio"
-            type="date"
-            placeholder="Ingrese fecha de inicio"
-            control={control}
-          />
-          <FormItem
-            id="endDate"
-            label="Fecha de Finalización"
-            type="date"
-            placeholder="Ingrese fecha de finalización"
-            control={control}
-          />
-          <FormSelect
-            id="productVersion"
-            label="Producto y Versión"
-            options={productOptions}
-            control={control}
-            onChange={fetchClients}
-          />
-          {selectedProductClients.length > 0 && (
-            <Card className="w-full">
-              <CardHeader>
-                <CardTitle>Clientes Asociados</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {selectedProductClients.length > 0 ? (
-                  selectedProductClients.map((client) => (
-                    <div key={client.id}>
-                      <p>{client.razonSocial}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p>No hay clientes asociados</p>
-                )}
-              </CardContent>
-            </Card>
-          )}
-          <div className="grid gap-2">
-            <Label htmlFor="taskIds">Tareas</Label>
-            <Controller
-              name="taskIds"
+        {loading ? (
+          <Skeleton />
+        ) : (
+          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+            <FormItem
+              id="title"
+              label="Título"
+              placeholder="Ingrese título del ticket"
               control={control}
-              defaultValue={[]}
-              render={({ field }) => (
-                <MultiSelect
-                  {...field}
-                  defaultValue={field.value || []}
-                  options={taskOptions}
-                  onValueChange={(values) =>
-                    field.onChange(values.map((v) => v))
-                  }
-                  placeholder="Seleccionar tareas"
-                />
-              )}
             />
-          </div>
-          <FormSelect
-            id="resourceId"
-            label="Recurso"
-            options={resourceOptions}
-            control={control}
-            onChange={(value) => {
-              const selectedResource = resources.find(
-                (resource) =>
-                  `${resource.Nombre} ${resource.Apellido}` === value,
-              );
-              if (selectedResource) {
-                setSelectedResource(selectedResource);
-                console.log('Selected resource:', selectedResource);
-              }
-            }}
-          />
-          <FormSelect
-            id="severity"
-            label="Severidad"
-            options={severityOptions}
-            control={control}
-          />
-          <FormSelect
-            id="status"
-            label="Estado"
-            options={statusOptions}
-            control={control}
-          />
-          <FormSelect
-            id="type"
-            label="Tipo"
-            options={typeOptions}
-            control={control}
-          />
-          <FormSelect
-            id="priority"
-            label="Prioridad"
-            options={priorityOptions}
-            control={control}
-          />
-          <div className="mt-4 flex justify-end gap-2">
-            <Button variant="secondary" onClick={() => navigate('/tickets')}>
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={!isValid}>
-              Editar
-            </Button>
-          </div>
-        </form>
+            <FormTextarea
+              id="description"
+              label="Descripción"
+              placeholder="Ingrese descripción del ticket"
+              control={control}
+            />
+            <FormItem
+              id="startDate"
+              label="Fecha de Inicio"
+              type="date"
+              placeholder="Ingrese fecha de inicio"
+              control={control}
+            />
+            <FormItem
+              id="endDate"
+              label="Fecha de Finalización"
+              type="date"
+              placeholder="Ingrese fecha de finalización"
+              control={control}
+            />
+            <FormSelect
+              id="productVersion"
+              label="Producto y Versión"
+              options={productOptions}
+              control={control}
+              onChange={fetchClients}
+            />
+            {selectedProductClients.length > 0 && (
+              <Card className="w-full">
+                <CardHeader>
+                  <CardTitle>Clientes Asociados</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {selectedProductClients.length > 0 ? (
+                    selectedProductClients.map((client) => (
+                      <div key={client.id}>
+                        <p>{client.razonSocial}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p>No hay clientes asociados</p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+            <div className="grid gap-2">
+              <Label htmlFor="taskIds">Tareas</Label>
+              <Controller
+                name="taskIds"
+                control={control}
+                defaultValue={[]}
+                render={({ field }) => (
+                  <MultiSelect
+                    {...field}
+                    defaultValue={field.value || []}
+                    options={taskOptions}
+                    onValueChange={(values) =>
+                      field.onChange(values.map((v) => v))
+                    }
+                    placeholder="Seleccionar tareas"
+                  />
+                )}
+              />
+            </div>
+            <FormSelect
+              id="resourceId"
+              label="Recurso"
+              options={resourceOptions}
+              control={control}
+              onChange={(value) => {
+                const selectedResource = resources.find(
+                  (resource) =>
+                    `${resource.Nombre} ${resource.Apellido}` === value,
+                );
+                if (selectedResource) {
+                  setSelectedResource(selectedResource);
+                }
+              }}
+            />
+            <FormSelect
+              id="severity"
+              label="Severidad"
+              options={severityOptions}
+              control={control}
+            />
+            <FormSelect
+              id="status"
+              label="Estado"
+              options={statusOptions}
+              control={control}
+            />
+            <FormSelect
+              id="type"
+              label="Tipo"
+              options={typeOptions}
+              control={control}
+            />
+            <FormSelect
+              id="priority"
+              label="Prioridad"
+              options={priorityOptions}
+              control={control}
+            />
+            <div className="mt-4 flex justify-end gap-2">
+              <Button variant="secondary" onClick={() => navigate('/tickets')}>
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={!isValid}>
+                Editar
+              </Button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );
 }
+
+// Skeleton Loader Component
+function Skeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <div className="h-4 w-1/4 rounded">
+          <span>Título</span>
+        </div>
+        <div className="h-8 w-full animate-pulse rounded bg-gray-300"></div>
+      </div>
+      <div className="space-y-2">
+        <div className="h-4 w-1/4 rounded">
+          <span>Descripción</span>
+        </div>
+        <div className="h-24 w-full animate-pulse rounded bg-gray-300"></div>
+      </div>
+      <div className="space-y-2">
+        <div className="h-4 w-1/4 rounded">
+          <span>Fecha de Inicio</span>
+        </div>
+        <div className="h-8 w-full animate-pulse rounded bg-gray-300"></div>
+      </div>
+      <div className="space-y-2">
+        <div className="h-4 w-1/4 rounded">
+          <span>Fecha de Finalización</span>
+        </div>
+        <div className="h-8 w-full animate-pulse rounded bg-gray-300"></div>
+      </div>
+      <div className="space-y-2">
+        <div className="h-4 w-1/4 rounded">
+          <span>Producto y Versión</span>
+        </div>
+        <div className="h-8 w-full animate-pulse rounded bg-gray-300"></div>
+      </div>
+      <div className="space-y-2">
+        <div className="h-4 w-1/4 rounded">
+          <span>Recurso</span>
+        </div>
+        <div className="h-8 w-full animate-pulse rounded bg-gray-300"></div>
+      </div>
+      <div className="space-y-2">
+        <div className="h-4 w-1/4 rounded">
+          <span>Prioridad</span>
+        </div>
+        <div className="h-8 w-full animate-pulse rounded bg-gray-300"></div>
+      </div>
+    </div>
+  );
+}
+
+export default Skeleton;
