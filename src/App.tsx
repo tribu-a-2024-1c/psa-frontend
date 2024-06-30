@@ -7,7 +7,9 @@ import { ThemeProvider } from './components/theme-provider';
 import {
   AddProjectPage,
   AddTaskPage,
-  ExamplePage,
+  ,
+  DashboardPage,
+  ,
   ProjectPage,
   TaskPage,
 } from './pages';
@@ -22,7 +24,7 @@ function App() {
       <BrowserRouter>
         <Layout>
           <Routes>
-            <Route path="/" element={<ExamplePage />} />
+            <Route path="/" element={<DashboardPage />} />
             <Route path="/projects" element={<ProjectPage />} />
             <Route path="/projects/new" element={<AddProjectPage />} />
             <Route path="/tasks" element={<TaskPage />} />

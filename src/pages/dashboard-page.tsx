@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-export const ExamplePage = () => {
+export const DashboardPage = () => {
   const filteredCards = menuItems.filter((item) => item.description);
 
   return (
