@@ -54,7 +54,7 @@ function FormTextarea({ id, label, placeholder, control }: FormTextareaProps) {
 interface FormSelectProps {
   id: string;
   label: string;
-  options: string[];
+  options: { label: string; value: string }[];
   control: Control<FieldValues>;
   onChange?: (value: string) => void;
 }
@@ -86,8 +86,8 @@ const FormSelect = React.forwardRef<HTMLDivElement, FormSelectProps>(
                 <SelectGroup>
                   <SelectLabel>{label}</SelectLabel>
                   {options.map((option) => (
-                    <SelectItem key={option} value={option}>
-                      {option}
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
                     </SelectItem>
                   ))}
                 </SelectGroup>
@@ -139,10 +139,12 @@ function FormSelectResource({
               }
             }}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full">
               <SelectValue placeholder={`Seleccionar ${label.toLowerCase()}`}>
                 {field.value
-                  ? `${field.value.Nombre} ${field.value.Apellido}`
+                  ? `${(field.value as Resource).name} ${
+                      (field.value as Resource).lastName
+                    }`
                   : `Seleccionar ${label.toLowerCase()}`}
               </SelectValue>
             </SelectTrigger>
@@ -277,8 +279,8 @@ export function UpdateProjectPage() {
       ...data,
       leader: {
         legajo: leader.legajo!,
-        nombre: leader.Nombre!,
-        apellido: leader.Apellido!,
+        nombre: leader.name!,
+        apellido: leader.lastName!,
       },
     };
     setIsSubmitting(true);
@@ -323,7 +325,10 @@ export function UpdateProjectPage() {
           <FormSelect
             id="status"
             label="Estado"
-            options={PROJECT_STATES}
+            options={PROJECT_STATES.map((state) => ({
+              label: state,
+              value: state,
+            }))}
             control={control}
           />
           <FormSelectResource
@@ -353,37 +358,37 @@ function Skeleton() {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <div className="h-4 w-1/4 rounded">
+        <div className="h-4 w-1/4 rounded bg-gray-300">
           <span>Título</span>
         </div>
         <div className="h-8 w-full animate-pulse rounded bg-gray-300"></div>
       </div>
       <div className="space-y-2">
-        <div className="h-4 w-1/4 rounded">
+        <div className="h-4 w-1/4 rounded bg-gray-300">
           <span>Descripción</span>
         </div>
         <div className="h-24 w-full animate-pulse rounded bg-gray-300"></div>
       </div>
       <div className="space-y-2">
-        <div className="h-4 w-1/4 rounded">
+        <div className="h-4 w-1/4 rounded bg-gray-300">
           <span>Fecha de Inicio</span>
         </div>
         <div className="h-8 w-full animate-pulse rounded bg-gray-300"></div>
       </div>
       <div className="space-y-2">
-        <div className="h-4 w-1/4 rounded">
+        <div className="h-4 w-1/4 rounded bg-gray-300">
           <span>Fecha de Finalización</span>
         </div>
         <div className="h-8 w-full animate-pulse rounded bg-gray-300"></div>
       </div>
       <div className="space-y-2">
-        <div className="h-4 w-1/4 rounded">
+        <div className="h-4 w-1/4 rounded bg-gray-300">
           <span>Estado</span>
         </div>
         <div className="h-8 w-full animate-pulse rounded bg-gray-300"></div>
       </div>
       <div className="space-y-2">
-        <div className="h-4 w-1/4 rounded">
+        <div className="h-4 w-1/4 rounded bg-gray-300">
           <span>Líder</span>
         </div>
         <div className="h-8 w-full animate-pulse rounded bg-gray-300"></div>
