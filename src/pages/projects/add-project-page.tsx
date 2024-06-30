@@ -4,7 +4,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
 import { client } from '@/api/common/client';
-import type { Project, Resource } from '@/api/types';
+import type { Resource } from '@/api/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -92,8 +92,7 @@ interface FormSelectResourceProps {
   options: Resource[];
   control: Control<FieldValues>;
   setValue: (name: string, value: unknown) => void;
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  getValues: () => any;
+  getValues: () => Resource | undefined;
 }
 
 function FormSelectResource({
@@ -127,8 +126,8 @@ function FormSelectResource({
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder={`Seleccionar ${label.toLowerCase()}`}>
-                {getValues('leader')
-                  ? `${getValues('leader').Nombre} ${getValues('leader').Apellido}`
+                {getValues()?.Nombre
+                  ? `${getValues()?.Nombre} ${getValues()?.Apellido}`
                   : `Seleccionar ${label.toLowerCase()}`}
               </SelectValue>
             </SelectTrigger>
@@ -211,7 +210,7 @@ export function AddProjectPage() {
       });
   }, []);
 
-  const createProject = (payload: Project) => {
+  const createProject = (payload: unknown) => {
     setIsSubmitting(true); // Set the submitting state to true when starting the submission
     client.projects
       .post('/projects', payload)
@@ -228,9 +227,13 @@ export function AddProjectPage() {
 
   const onSubmit = (data: FieldValues) => {
     const leader = getValues('leader') as Resource;
-    const payload: Project = {
+    const payload = {
       ...data,
-      leader,
+      leader: {
+        legajo: leader.legajo!,
+        nombre: leader.Nombre!,
+        apellido: leader.Apellido!,
+      },
     };
     setIsSubmitting(true); // Set the submitting state to true when starting the submission
     createProject(payload);

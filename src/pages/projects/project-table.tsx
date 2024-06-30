@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-import type { Project } from '@/api/types';
+import type { ShowProject } from '@/api/types';
 import {
   Table,
   TableBody,
@@ -17,13 +17,15 @@ export function ProjectTable({
   projects,
   isLoading,
 }: {
-  projects: Project[] | null | undefined;
+  projects: ShowProject[] | null | undefined;
   isLoading: boolean;
 }) {
   const sortedProjects = projects
     ? [...projects].sort((a, b) => {
-        const idA = typeof a.id === 'number' ? a.id : parseInt(a.id, 10);
-        const idB = typeof b.id === 'number' ? b.id : parseInt(b.id, 10);
+        const idA =
+          typeof a.id === 'number' ? a.id : parseInt(a.id as string, 10);
+        const idB =
+          typeof b.id === 'number' ? b.id : parseInt(b.id as string, 10);
         return idB - idA;
       })
     : [];
@@ -51,7 +53,7 @@ export function ProjectTable({
                     ))}
                   </TableRow>
                 ))
-            : sortedProjects?.map((project: Project) => (
+            : sortedProjects?.map((project: ShowProject) => (
                 <TableRow key={project.id}>
                   <TableCell className="text-center">{project?.id}</TableCell>
                   <TableCell className="text-center">{project.title}</TableCell>

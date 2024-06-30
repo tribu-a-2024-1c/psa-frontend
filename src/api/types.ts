@@ -34,6 +34,20 @@ export interface Project {
   };
 }
 
+export interface ShowProject {
+  id?: number | string;
+  title: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  description: string;
+  leader?: {
+    legajo: number;
+    name: string;
+    lastName: string;
+  };
+}
+
 export interface Task {
   id: number;
   title: string;

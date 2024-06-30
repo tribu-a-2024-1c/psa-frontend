@@ -118,7 +118,7 @@ export function TaskPage() {
                   <SelectLabel>Proyecto</SelectLabel>
                   <SelectItem value="all">Todos los proyectos</SelectItem>
                   {projects.map((project) => (
-                    <SelectItem key={project.id} value={project.id.toString()}>
+                    <SelectItem key={project.id} value={String(project.id)}>
                       {project.title}
                     </SelectItem>
                   ))}

@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { client } from '@/api/common/client';
-import type { Project } from '@/api/types';
+import type { ShowProject } from '@/api/types';
 import { Button } from '@/components/ui/button';
 
 import { ProjectTable } from './project-table';
 
 export function ProjectPage() {
-  const [projects, setProjects] = useState<Project[] | null>();
+  const [projects, setProjects] = useState<ShowProject[] | null>();
   const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
