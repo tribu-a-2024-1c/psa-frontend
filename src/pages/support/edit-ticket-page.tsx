@@ -68,8 +68,8 @@ interface FormSelectProps {
   onChange?: (value: string) => void;
 }
 
-const FormSelect = React.forwardRef<HTMLSelectElement, FormSelectProps>(
-  ({ id, label, options, control, onChange }, ref) => {
+const FormSelect = React.forwardRef<HTMLDivElement, FormSelectProps>(
+  ({ id, label, options, control, onChange }) => {
     return (
       <div className="grid gap-2">
         <Label htmlFor={id}>{label}</Label>
@@ -86,7 +86,7 @@ const FormSelect = React.forwardRef<HTMLSelectElement, FormSelectProps>(
                 onChange && onChange(value);
               }}
             >
-              <SelectTrigger className="w-full" ref={ref}>
+              <SelectTrigger className="w-full">
                 <SelectValue
                   placeholder={`Seleccionar ${label.toLowerCase()}`}
                 />
@@ -108,6 +108,8 @@ const FormSelect = React.forwardRef<HTMLSelectElement, FormSelectProps>(
     );
   },
 );
+
+FormSelect.displayName = 'FormSelect';
 
 interface FormItemProps {
   id: string;
@@ -264,7 +266,7 @@ export function EditTicketPage() {
   const editTicket = (payload: CreateTicketPayload) => {
     client.support
       .put(`/tickets/${ticketId}/updateTicket`, payload)
-      .then((response) => {
+      .then(() => {
         if (selectedResource) {
           return client.support.post(`/tickets/${ticketId}/resource`, {
             legajo: selectedResource.legajo!,
