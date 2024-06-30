@@ -193,9 +193,7 @@ export function EditTicketPage() {
           await client.projects.get<Task[]>('/projects/tasks');
         setTasks(taskResponse.data);
 
-        const resourceResponse = await client.psa.get<Resource[]>(
-          '/772e9395-6097-4072-925d-f6a0f822320b',
-        );
+        const resourceResponse = await client.psa.get<Resource[]>('/');
         setResources(
           Array.isArray(resourceResponse?.data) ? resourceResponse.data : [],
         );

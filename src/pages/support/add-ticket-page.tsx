@@ -182,7 +182,7 @@ export function AddTicketPage() {
       });
 
     client.psa
-      .get<Resource[]>('/772e9395-6097-4072-925d-f6a0f822320b')
+      .get<Resource[]>('/')
       .then((response) => {
         if (Array.isArray(response?.data)) {
           setResources(response.data);
