@@ -156,6 +156,7 @@ export function EditTicketPage() {
     null,
   );
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para manejar el estado de carga del botón
   const navigate = useNavigate();
   const { ticketId } = useParams<{ ticketId?: string }>();
 
@@ -283,6 +284,9 @@ export function EditTicketPage() {
       })
       .catch((error) => {
         console.error('Error editing or assigning resource to ticket:', error);
+      })
+      .finally(() => {
+        setIsSubmitting(false); // Reset the state after submission is done
       });
   };
 
@@ -316,6 +320,7 @@ export function EditTicketPage() {
         }
       }
 
+      setIsSubmitting(true); // Set the submitting state to true when starting the submission
       editTicket(payload);
     } else {
       console.error('Product version ID is required');
@@ -480,8 +485,8 @@ export function EditTicketPage() {
               <Button variant="secondary" onClick={() => navigate('/tickets')}>
                 Cancelar
               </Button>
-              <Button type="submit" disabled={!isValid}>
-                Editar
+              <Button type="submit" disabled={!isValid || isSubmitting}>
+                {isSubmitting ? 'Actualizando...' : 'Editar'}
               </Button>
             </div>
           </form>

@@ -91,7 +91,7 @@ interface FormSelectResourceProps {
   label: string;
   options: Resource[];
   control: Control<FieldValues>;
-  setValue: (name: string, value: any) => void;
+  setValue: (name: string, value: unknown) => void;
   getValues: () => any;
 }
 
@@ -113,10 +113,10 @@ function FormSelectResource({
         control={control}
         render={({ field }) => (
           <Select
-            value={JSON.stringify(field.value)}
+            value={field.value ? JSON.stringify(field.value) : ''}
             onValueChange={(value) => {
               try {
-                const resource = JSON.parse(value);
+                const resource: Resource = JSON.parse(value);
                 field.onChange(resource);
                 setValue('leader', resource);
               } catch (error) {
@@ -192,6 +192,7 @@ export function AddProjectPage() {
   } = useForm({ mode: 'onChange' });
 
   const [resources, setResources] = useState<Resource[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para manejar el estado de carga del botón
 
   useEffect(() => {
     client.psa
@@ -210,22 +211,27 @@ export function AddProjectPage() {
   }, []);
 
   const createProject = (payload: Project) => {
+    setIsSubmitting(true); // Set the submitting state to true when starting the submission
     client.projects
-      .post('/projects', { ...payload })
+      .post('/projects', payload)
       .then(() => {
         navigate('/projects');
       })
       .catch((error) => {
         console.error('Error creating project:', error);
+      })
+      .finally(() => {
+        setIsSubmitting(false); // Reset the state after submission is done
       });
   };
 
   const onSubmit = (data: FieldValues) => {
-    const leader = getValues('leader');
+    const leader = getValues('leader') as Resource;
     const payload: Project = {
       ...data,
       leader,
     };
+    setIsSubmitting(true); // Set the submitting state to true when starting the submission
     createProject(payload);
   };
 
@@ -278,8 +284,8 @@ export function AddProjectPage() {
             <Button variant="secondary" onClick={() => navigate('/projects')}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={!isValid}>
-              Agregar
+            <Button type="submit" disabled={!isValid || isSubmitting}>
+              {isSubmitting ? 'Cargando...' : 'Guardar'}
             </Button>
           </div>
         </form>

@@ -150,6 +150,7 @@ export function AddTicketPage() {
     null,
   );
   const [_, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para manejar el estado de carga del botón
   const navigate = useNavigate();
 
   const {
@@ -236,6 +237,9 @@ export function AddTicketPage() {
       })
       .catch((error) => {
         console.error('Error creating or assigning resource to ticket:', error);
+      })
+      .finally(() => {
+        setIsSubmitting(false); // Reset the state after submission is done
       });
   };
 
@@ -259,6 +263,7 @@ export function AddTicketPage() {
           : undefined,
       };
 
+      setIsSubmitting(true); // Set the submitting state to true when starting the submission
       createTicket(payload);
     } else {
       console.error('Product version ID is required');
@@ -397,8 +402,8 @@ export function AddTicketPage() {
             <Button variant="secondary" onClick={() => navigate('/tickets')}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={!isValid}>
-              Agregar
+            <Button type="submit" disabled={!isValid || isSubmitting}>
+              {isSubmitting ? 'Guardando...' : 'Guardar'}
             </Button>
           </div>
         </form>

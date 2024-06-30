@@ -256,6 +256,7 @@ export function AddTaskPage() {
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para manejar el estado de carga del botón
 
   const createTask = (payload: Task) => {
     const { project, resource, ...restPayload } = payload;
@@ -277,6 +278,9 @@ export function AddTaskPage() {
       })
       .catch((error) => {
         console.error('Error creating task:', error);
+      })
+      .finally(() => {
+        setIsSubmitting(false); // Reset the state after submission is done
       });
   };
 
@@ -301,6 +305,9 @@ export function AddTaskPage() {
       })
       .catch((error) => {
         console.error('Error editing task:', error);
+      })
+      .finally(() => {
+        setIsSubmitting(false); // Reset the state after submission is done
       });
   };
 
@@ -375,6 +382,7 @@ export function AddTaskPage() {
   }, []);
 
   const onSubmit = (data: FieldValues) => {
+    setIsSubmitting(true); // Set the submitting state to true when starting the submission
     if (projectId && taskId) {
       editTask(data as Task);
     } else {
@@ -458,8 +466,12 @@ export function AddTaskPage() {
             <Button variant="secondary" onClick={() => navigate('/tasks')}>
               Cancelar
             </Button>
-            <Button type="submit" disabled={!isValid}>
-              {projectId && taskId ? 'Editar' : 'Crear'}
+            <Button type="submit" disabled={!isValid || isSubmitting}>
+              {isSubmitting
+                ? 'Cargando...'
+                : projectId && taskId
+                  ? 'Editar'
+                  : 'Crear'}
             </Button>
           </div>
         </form>
